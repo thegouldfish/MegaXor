@@ -13,8 +13,8 @@ The player controls two shields, Magus and Questor, which can be moved horizonta
 
 Currrently the first three levels have been implemented
 
-![](https://www.dropbox.com/s/aiguz147ccxddi9/rom_007.png?raw=1)
-![](https://www.dropbox.com/s/aiguz147ccxddi9/rom_008.png?raw=1)
+![](https://www.dropbox.com/s/tfj7yxnppl3ard2/rom_007.png?raw=1)
+![](https://www.dropbox.com/s/cfbbm3qvjglg2ua/rom_008.png?raw=1)
 
 To replay a completed solution press C when selecting a level.
 
