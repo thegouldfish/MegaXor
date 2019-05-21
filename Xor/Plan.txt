@@ -1,0 +1,11 @@
+Plan.
+
+* DMA transfer for drawing new rows and columns
+* Add death state
+* move game states out of player
+* tidy up player code
+	* Update mini map when mask is collected
+	* use a list's for chickens and fish.
+	* record player input
+	* add completed solutions
+	* add basic replay
