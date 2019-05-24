@@ -20,6 +20,65 @@ static s16 _playerScreenY;
 
 static Sprite* _player;
 
+
+static void SetPositions()
+{
+	//KLog_S2("x ", _playerX, " y ", _playerY);
+
+	s16 midX = screenWidth / 2;
+	s16 midY = screenHeight / 2;
+
+	//KLog_S2("midx ", midX, " midy ", midY);
+
+
+	_playerScreenX = (_playerX * 24);
+	_playerScreenY = (_playerY * 24);
+
+	s16 left = _playerScreenX - midX;
+	s16 right = _playerScreenX + midX;
+
+
+	//KLog_S4("sx ", _playerScreenX, " sy ", _playerScreenY, " left ",left, " right ", right);
+	if (left < 0)
+	{
+		_cameraX = 0;
+	}
+	else if (right > 768)
+	{
+		_cameraX = 768 - screenWidth;
+		_playerScreenX += (screenWidth - 768);
+	}
+	else
+	{
+		_cameraX = left;
+		_playerScreenX -= _cameraX;
+	}
+
+
+	s16 top = _playerScreenY - midY;
+	s16 bottom = _playerScreenY + midY;
+	if (top < 0)
+	{
+		_cameraY = 0;
+	}
+	else if (bottom > 768)
+	{
+		_cameraY = 768 - screenHeight;
+		_playerScreenY += (screenHeight - 768);
+	}
+	else
+	{
+		_cameraY = top;
+		_playerScreenY -= _cameraY;
+	}
+
+	//KLog_S2("camx ", _cameraX, " camy ", _cameraY);
+
+	SetMapCamera(_cameraX, _cameraY);
+	SPR_setPosition(_player, _playerScreenX, _playerScreenY);
+}
+
+
 void StateMoveTest_Start()
 {
 	InitTileSets();
@@ -54,62 +113,7 @@ void StateMoveTest_Start()
 }
 
 
-void SetPositions()
-{
-	//KLog_S2("x ", _playerX, " y ", _playerY);
 
-	s16 midX = screenWidth / 2;
-	s16 midY = screenHeight / 2;
-	
-	//KLog_S2("midx ", midX, " midy ", midY);
-
-
-	_playerScreenX = (_playerX * 24);
-	_playerScreenY = (_playerY * 24);
-
-	s16 left = _playerScreenX - midX;
-	s16 right = _playerScreenX + midX;
-
-
-	//KLog_S4("sx ", _playerScreenX, " sy ", _playerScreenY, " left ",left, " right ", right);
-	if (left < 0)
-	{
-		_cameraX = 0;
-	}
-	else if (right > 768)
-	{
-		_cameraX = 768 - screenWidth;
-		_playerScreenX += (screenWidth - 768);
-	}
-	else
-	{		
-		_cameraX = left;
-		_playerScreenX -= _cameraX;
-	}
-
-
-	s16 top = _playerScreenY - midY;
-	s16 bottom = _playerScreenY + midY;
-	if (top < 0)
-	{
-		_cameraY = 0;
-	}
-	else if (bottom > 768)
-	{
-		_cameraY = 768 - screenHeight;
-		_playerScreenY += (screenHeight - 768);
-	}
-	else
-	{
-		_cameraY = top;
-		_playerScreenY -= _cameraY;
-	}
-
-	//KLog_S2("camx ", _cameraX, " camy ", _cameraY);
-
-	SetMapCamera(_cameraX, _cameraY);
-	SPR_setPosition(_player, _playerScreenX, _playerScreenY);
-}
 
 
 void StateMoveTest_Update()

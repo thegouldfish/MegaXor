@@ -47,6 +47,8 @@ static u8 _moveType;
 
 static u8 _playerDead;
 
+static s16 _previousMasksCollected;
+
 void SetNumbers(int number, Sprite* sprites[], const int size)
 {
 	int numbs[10] = { 0,0,0,0,0,0,0,0,0,0 };
@@ -140,11 +142,11 @@ void StatePlayGame_Start()
 	
 	
 	
-	_player = SPR_addSprite(&ShieldSprites, 0, 0, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
+	_player = SPR_addSprite(&ShieldSprites, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
 	SPR_setFrame(_player, 0);
 
 
-	_playerUI = SPR_addSprite(&ShieldSprites, 292, 196, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
+	_playerUI = SPR_addSprite(&ShieldSprites, 292, 196, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
 	SPR_setFrame(_playerUI, 0);
 
 
@@ -153,18 +155,18 @@ void StatePlayGame_Start()
 
 	_currentMoveCount = 0;
 
-	_masksCollected[0] = SPR_addSprite(&sp_numbers, 296, 68, TILE_ATTR(PAL3, TRUE, FALSE, FALSE));
-	_masksCollected[1] = SPR_addSprite(&sp_numbers, 304, 68, TILE_ATTR(PAL3, TRUE, FALSE, FALSE));
+	_masksCollected[0] = SPR_addSprite(&sp_numbers, 296, 68, TILE_ATTR(PAL3, FALSE, FALSE, FALSE));
+	_masksCollected[1] = SPR_addSprite(&sp_numbers, 304, 68, TILE_ATTR(PAL3, FALSE, FALSE, FALSE));
 
 	
-	_masksTotal[0] = SPR_addSprite(&sp_numbers, 296, 130, TILE_ATTR(PAL3, TRUE, FALSE, FALSE));
-	_masksTotal[1] = SPR_addSprite(&sp_numbers, 304, 130, TILE_ATTR(PAL3, TRUE, FALSE, FALSE));
+	_masksTotal[0] = SPR_addSprite(&sp_numbers, 296, 130, TILE_ATTR(PAL3, FALSE, FALSE, FALSE));
+	_masksTotal[1] = SPR_addSprite(&sp_numbers, 304, 130, TILE_ATTR(PAL3, FALSE, FALSE, FALSE));
 
 
-	_moves[0] = SPR_addSprite(&sp_numbers, 288, 172, TILE_ATTR(PAL3, TRUE, FALSE, FALSE));
-	_moves[1] = SPR_addSprite(&sp_numbers, 296, 172, TILE_ATTR(PAL3, TRUE, FALSE, FALSE));
-	_moves[2] = SPR_addSprite(&sp_numbers, 304, 172, TILE_ATTR(PAL3, TRUE, FALSE, FALSE));
-	_moves[3] = SPR_addSprite(&sp_numbers, 312, 172, TILE_ATTR(PAL3, TRUE, FALSE, FALSE));
+	_moves[0] = SPR_addSprite(&sp_numbers, 288, 172, TILE_ATTR(PAL3, FALSE, FALSE, FALSE));
+	_moves[1] = SPR_addSprite(&sp_numbers, 296, 172, TILE_ATTR(PAL3, FALSE, FALSE, FALSE));
+	_moves[2] = SPR_addSprite(&sp_numbers, 304, 172, TILE_ATTR(PAL3, FALSE, FALSE, FALSE));
+	_moves[3] = SPR_addSprite(&sp_numbers, 312, 172, TILE_ATTR(PAL3, FALSE, FALSE, FALSE));
 	
 
 	PlayersSetup();	
@@ -179,7 +181,6 @@ void StatePlayGame_Start()
 
 	GenerateTiles2();
 	SYS_enableInts();
-	ActiveReset();
 
 	UpdatePlans();
 	SPR_setPosition(_player, CurrentPlayer->ScreenX, CurrentPlayer->ScreenY);
@@ -204,6 +205,7 @@ void StatePlayGame_Start()
 
 	_moveType = MOVED_NONE;
 
+	_previousMasksCollected = 0;
 	VDP_fadeIn(0, (4 * 16) - 1, GameScreenPalette, 10, FALSE);
 }
 
@@ -333,10 +335,14 @@ void StatePlayGame_Update()
 			PlayerEndMove();
 			FishFinishMovement();
 			ChickenFinishMovement();
-			GenerateTiles2();
-			SetNumbers(MasksCollected, _masksCollected, 2);
-			SetNumbers(StepsTaken, _moves, 4);
-			
+			if (MasksCollected != _previousMasksCollected)
+			{
+				_previousMasksCollected = MasksCollected;
+				GenerateTiles2();
+				SetNumbers(MasksCollected, _masksCollected, 2);
+			}
+
+			SetNumbers(StepsTaken, _moves, 4);			
 			break;
 		}
 

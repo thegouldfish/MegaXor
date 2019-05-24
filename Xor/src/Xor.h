@@ -3,6 +3,14 @@
 
 #include <genesis.h>
 
+
+#include "SimpleState.h"
+#include "PadHelper.h"
+
+extern StateMachine GameMachineState;
+
+extern Pad Pad1;
+
 extern u8 SelectedLevel;
 extern u8 PlaySolution;
 extern fix32 MovementPerFrame;
@@ -10,6 +18,8 @@ extern fix32 MovementPerFrame;
 
 extern u16 CameraXOffset;
 extern u16 CameraYOffset;
+
+extern char* Version;
 
 #define MOVE_DIRECTION_UP 1
 #define MOVE_DIRECTION_DOWN 2

@@ -7,3 +7,6 @@ fix32 MovementPerFrame;
 u16 CameraXOffset;
 u16 CameraYOffset;
 u8 PlaySolution;
+
+
+char* Version = "V0.2";

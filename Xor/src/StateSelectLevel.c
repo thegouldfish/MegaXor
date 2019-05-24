@@ -9,16 +9,16 @@
 #include "Globals.h"
 #include "Xor.h"
 
-static u8 _previousSelection = 0;
-static u8 _currentSelection = 0;
+static s8 _previousSelection = 0;
+static s8 _currentSelection = 0;
 
 
 void SetBackingHighlight()
 {
 	for (u8 i = 0; i < 29; i++)
 	{
-		VDP_setTileMapXY(PLAN_B, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, 4), 6 + i, _previousSelection + 8);
-		VDP_setTileMapXY(PLAN_B, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, 5), 6 + i, _currentSelection + 8);
+		VDP_setTileMapXY(PLAN_B, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, 13), 6 + i, _previousSelection + 8);
+		VDP_setTileMapXY(PLAN_B, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, 1), 6 + i, _currentSelection + 8);
 	}
 }
 
@@ -82,6 +82,9 @@ void StateLevelSelect_Start()
 	}
 
 	SetBackingHighlight();
+
+
+	VDP_drawText(Version, 32, 28);
 
 	SYS_enableInts();
 }

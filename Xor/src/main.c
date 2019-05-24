@@ -1,6 +1,6 @@
 #include <genesis.h>
 
-#include "Globals.h"
+#include "Xor.h"
 
 #include "StatePlayGame.h"
 #include "StateSelectLevel.h"
