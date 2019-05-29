@@ -1,11 +1,23 @@
-Plan.
+Plan
+----
 
-* DMA transfer for drawing new rows and columns
-* Add death state
+To do
+=====
 * move game states out of player
 * tidy up player code
-	* Update mini map when mask is collected
-	* use a list's for chickens and fish.
-	* record player input
-	* add completed solutions
-	* add basic replay
+* Speed up code
+* Add bombs killing players
+* Add Level 5
+* Add user initated replays
+
+Done
+====
+* DMA transfer for drawing new rows and columns
+* Update mini map when mask is collected
+* use a list's for chickens and fish.
+* record player input
+* add completed solutions
+* add basic replay
+* Add death state
+* Add bombs
+* Add (and fix up) Level 4

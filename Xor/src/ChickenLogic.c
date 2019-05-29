@@ -5,16 +5,22 @@
 #include "TileDefinitions.h"
 #include "Xor.h"
 #include "Players.h"
-
+#include "BombH.h"
+#include "BombV.h"
+#include "Explosion.h"
+#include "CommonLogic.h"
 #include "../res/sprite.h"
 
 
-static ActiveTileItem _chickenTile;
+
 
 
 #define CHICKEN_MAX 100
 static ActivePoint _chickens[CHICKEN_MAX];
 static u8 _chickenCount;
+
+static ActiveTileItem _chickenTile;
+
 
 void ChickenSetup()
 {
@@ -50,63 +56,11 @@ void ChickenSetup()
 
 
 
-static void DoMovement(u8 x, u8 y, u8 newX, u8 newY, u8 direction, u8 trackedId)
-{
-	_chickenTile.CurrentMetaX = x;
-	_chickenTile.CurrentMetaY = y;
-
-	_chickenTile.DestinationMetaX = newX;
-	_chickenTile.DestinationMetaY = newY;
-
-
-	_chickenTile.DestinationScreenX = newX * 24;
-	_chickenTile.DestinationScreenY = newY * 24;
-
-
-	_chickenTile.MoveRemaining = fix32Add(MovementPerFrame, FIX32(24));
-	_chickenTile.MoveDirection = direction;
-
-	_chickenTile.IsActive = TRUE;
-
-	CurrentMapDataState[MAP_XY_TO_TILE(x, y)] = TILE_TYPE_FLOOR;
-	ChickenUpdateMovement();
-
-	_chickens[trackedId].Active = TRUE;
-
-	UpdateTile(_chickenTile.CurrentMetaX, _chickenTile.CurrentMetaY, TILE_TYPE_FLOOR);
-
-	for (u8 i = 0; i < _chickenCount; i++)
-	{
-		if (_chickens[i].X == x && _chickens[i].Y == y)
-		{
-			_chickenTile.ActiveIndex = i;
-			break;
-		}
-	}
-}
-
-
-static u8 FindId(u16 x, u16 y)
-{
-	for (u8 i = 0; i < _chickenCount; i++)
-	{
-		if (_chickens[i].X == -x && _chickens[i].Y == y)
-		{
-			return i;
-		}
-	}
-
-	return 0;
-}
-
-
 
 u8 ChickenPushUp(u16 x, u16 y)
 {
 	u16 yCheck = y - 1;
-
 	u8 tile = CurrentMapDataState[MAP_XY_TO_TILE(x, yCheck)];
-
 	u8 canMove = FALSE;
 
 
@@ -115,7 +69,7 @@ u8 ChickenPushUp(u16 x, u16 y)
 		case TILE_TYPE_FORCEFIELD_V:
 		case TILE_TYPE_FLOOR:
 			canMove = TRUE;
-
+			break;
 
 		default:
 			break;
@@ -125,7 +79,7 @@ u8 ChickenPushUp(u16 x, u16 y)
 
 	if (canMove)
 	{
-		DoMovement(x, y, x, yCheck, MOVE_DIRECTION_UP, FindId(x,y));
+		DoMovementCommon(x, y, x, yCheck, MOVE_DIRECTION_UP, FindId(x, y, _chickens, _chickenCount), &_chickenTile, _chickens);
 	}
 
 	return canMove;
@@ -145,20 +99,20 @@ u8 ChickenPushDown(u16 x, u16 y)
 
 	switch (tile)
 	{
-	case TILE_TYPE_FORCEFIELD_V:
-	case TILE_TYPE_FLOOR:
-		canMove = TRUE;
+		case TILE_TYPE_FORCEFIELD_V:
+		case TILE_TYPE_FLOOR:
+			canMove = TRUE;
+			break;
 
-
-	default:
-		break;
+		default:
+			break;
 	}
 
 
 
 	if (canMove)
 	{
-		DoMovement(x, y, x, yCheck, MOVE_DIRECTION_DOWN, FindId(x,y));
+		DoMovementCommon(x, y, x, yCheck, MOVE_DIRECTION_DOWN, FindId(x, y, _chickens, _chickenCount), &_chickenTile, _chickens);		
 	}
 
 	return canMove;
@@ -172,22 +126,38 @@ static u8 CanMoveLeft(u8 x, u8 y, u8 trackedId)
 {
 	u16 xCheck = x - 1;
 
-
 	u8 tile = CurrentMapDataState[MAP_XY_TO_TILE(xCheck, y)];
-
 	u8 canMove = FALSE;
-
-
 	u8 canKill = _chickens[trackedId].Active;
-
-
 
 	switch (tile)
 	{
 		case TILE_TYPE_FORCEFIELD_H:
 		case TILE_TYPE_FLOOR:
 			canMove = TRUE;
+			break;
 
+
+		case TILE_TYPE_BOMB_H:
+		case TILE_TYPE_BOMB_V:
+			if (canKill)
+			{
+				if (tile == TILE_TYPE_BOMB_H)
+				{
+					TriggerBombH(xCheck, y);
+				}
+				else if (tile == TILE_TYPE_BOMB_V)
+				{
+					TriggerBombV(xCheck, y);
+				}
+
+				_chickens[trackedId].X = -1;
+				_chickens[trackedId].Y = -1;
+				_chickens[trackedId].Active = FALSE;
+				PlaceExplosion(x, y);
+				canMove = FALSE;
+			}
+			break;
 
 		default:
 			break;
@@ -202,7 +172,7 @@ static u8 CanMoveLeft(u8 x, u8 y, u8 trackedId)
 
 	if (canMove)
 	{
-		DoMovement(x, y, xCheck, y, MOVE_DIRECTION_LEFT, trackedId);
+		DoMovementCommon(x, y, xCheck, y, MOVE_DIRECTION_LEFT, FindId(x, y, _chickens, _chickenCount), &_chickenTile, _chickens);		
 	}
 
 	return canMove;
@@ -212,66 +182,7 @@ static u8 CanMoveLeft(u8 x, u8 y, u8 trackedId)
 
 u8 ChickenUpdateMovement()
 {
-	u8 done = TRUE;
-
-	if (_chickenTile.IsActive)
-	{
-		_chickenTile.MoveRemaining = fix32Sub(_chickenTile.MoveRemaining, MovementPerFrame);
-
-		if (fix32ToInt(_chickenTile.MoveRemaining) < 0)
-		{
-			_chickenTile.MoveRemaining = 0;
-		}
-		else
-		{
-			done = FALSE;
-		}
-
-		u16 x = 0;
-		u16 y = 0;
-		switch (_chickenTile.MoveDirection)
-		{
-			case MOVE_DIRECTION_LEFT:
-			{
-				y = _chickenTile.DestinationScreenY;
-				x = _chickenTile.DestinationScreenX + fix32ToInt(_chickenTile.MoveRemaining);
-				break;
-			}
-
-			case MOVE_DIRECTION_RIGHT:
-			{
-				y = _chickenTile.DestinationScreenY;
-				x = _chickenTile.DestinationScreenX - fix32ToInt(_chickenTile.MoveRemaining);
-				break;
-			}
-
-			case MOVE_DIRECTION_UP:
-			{
-				y = _chickenTile.DestinationScreenY + fix32ToInt(_chickenTile.MoveRemaining);
-				x = _chickenTile.DestinationScreenX;
-				break;
-			}
-
-			case MOVE_DIRECTION_DOWN:
-			{
-				y = _chickenTile.DestinationScreenY - fix32ToInt(_chickenTile.MoveRemaining);
-				x = _chickenTile.DestinationScreenX;
-				break;
-			}
-
-			default:
-				break;
-		}
-
-		x += CameraXOffset;
-		y += CameraYOffset;
-
-		SPR_setPosition(_chickenTile.ActiveSprite, x, y);
-		SPR_setVisibility(_chickenTile.ActiveSprite, VISIBLE);
-		SPR_update();
-	}
-
-	return done;
+	return UpdateMovementCommon(&_chickenTile);
 }
 
 void ChickenFinishMovement()
@@ -282,20 +193,26 @@ void ChickenFinishMovement()
 		_chickens[_chickenTile.ActiveIndex].Y = _chickenTile.DestinationMetaY;
 
 		_chickenTile.IsActive = FALSE;
-		CurrentMapDataState[MAP_XY_TO_TILE(_chickenTile.DestinationMetaX, _chickenTile.DestinationMetaY)] = TILE_TYPE_CHICKEN;
-		UpdateTile(_chickenTile.DestinationMetaX, _chickenTile.DestinationMetaY, TILE_TYPE_CHICKEN);
-		SPR_setVisibility(_chickenTile.ActiveSprite, HIDDEN);
-
+		
+		
+		if (_chickenTile.OnScreen)
+		{
+			UpdateTile(_chickenTile.DestinationMetaX, _chickenTile.DestinationMetaY, TILE_TYPE_CHICKEN);
+			SPR_setVisibility(_chickenTile.ActiveSprite, HIDDEN);
+		}
+		else
+		{
+			CurrentMapDataState[MAP_XY_TO_TILE(_chickenTile.DestinationMetaX, _chickenTile.DestinationMetaY)] = TILE_TYPE_CHICKEN;
+		}
+		
 
 		u8 tile = CurrentMapDataState[MAP_XY_TO_TILE(_chickenTile.DestinationMetaX, _chickenTile.DestinationMetaY)];
 		if (CurrentPlayer->MetaX == _chickenTile.DestinationMetaX && CurrentPlayer->MetaY == _chickenTile.DestinationMetaY)
 		{
-			KLog("Chicken Killing Current Player");
 			PlayerKillCurrent();
 		}
 		else if (tile == TILE_TYPE_MAGNUS || tile == TILE_TYPE_QUESTOR)
 		{
-			KLog("Chicken Killing Other Player");
 			PlayerKillOther();
 		}
 	}

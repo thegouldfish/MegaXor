@@ -6,7 +6,6 @@
 
 #include "PadHelper.h"
 #include "GameMaps.h"
-#include "Globals.h"
 #include "Xor.h"
 
 static s8 _previousSelection = 0;

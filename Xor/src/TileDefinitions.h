@@ -3,7 +3,7 @@
 
 #include <genesis.h>
 
-#define TILECOUNT 11
+#define TILECOUNT 14
 
 #define TILE_TYPE_WALL 0
 #define TILE_TYPE_FLOOR 1
@@ -18,6 +18,11 @@
 
 #define TILE_TYPE_FISH 9
 #define TILE_TYPE_CHICKEN 10
+
+#define TILE_TYPE_BOMB_H 11
+#define TILE_TYPE_BOMB_V 12
+
+#define TILE_TYPE_EXPLOSION 13
 
 
 #define TILE_PLAN_A 0
@@ -34,7 +39,9 @@ typedef struct
 	u8 Plan;
 
 
-	u8 TileType;	
+	u8 TileType;
+
+	u8 Priority;
 } TileDefinition;
 
 

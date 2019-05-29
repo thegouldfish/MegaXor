@@ -2,7 +2,6 @@
 
 #include "Map.h"
 #include "StateMapTest.h"
-#include "Globals.h"
 #include "PadHelper.h"
 
 static s16 _cameraX;

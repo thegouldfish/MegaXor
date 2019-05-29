@@ -27,9 +27,6 @@ u8 CurrentMapDataState[MAP_SIZE];
 const MapDefinition* CurrentMap = 0;
 
 u16 GameScreenPalette[64];
-
-
-
 u16 VramTileIndex = 0;
 
 
@@ -83,8 +80,10 @@ void InitTileSets()
 	TileLookupInfos[0].Palette = 0;
 	TileLookupInfos[0].TileIndex = VramTileIndex;
 	TileLookupInfos[0].YLookup[0] = 0;
-	TileLookupInfos[0].YLookup[1] = 15;
-	TileLookupInfos[0].YLookup[2] = 30;
+	TileLookupInfos[0].YLookup[1] = tile_set1.map->w;
+	TileLookupInfos[0].YLookup[2] = TileLookupInfos[0].YLookup[1] * 2;
+
+	KLog_U3("w ", tile_set1.map->w, "   1: ", TileLookupInfos[0].YLookup[1], "   2: ", TileLookupInfos[0].YLookup[2]);
 
 	VramTileIndex += tile_set1.tileset->numTile;
 
@@ -95,8 +94,8 @@ void InitTileSets()
 	TileLookupInfos[1].Palette = 1;
 	TileLookupInfos[1].TileIndex = VramTileIndex;
 	TileLookupInfos[1].YLookup[0] = 0;
-	TileLookupInfos[1].YLookup[1] = 21;
-	TileLookupInfos[1].YLookup[2] = 42;
+	TileLookupInfos[1].YLookup[1] = tile_set2.map->w;
+	TileLookupInfos[1].YLookup[2] = TileLookupInfos[1].YLookup[1] * 2;
 
 	VramTileIndex += tile_set2.tileset->numTile;
 
@@ -108,8 +107,8 @@ void InitTileSets()
 	TileLookupInfos[2].Palette = 2;
 	TileLookupInfos[2].TileIndex = VramTileIndex;
 	TileLookupInfos[2].YLookup[0] = 0;
-	TileLookupInfos[2].YLookup[1] = 6;
-	TileLookupInfos[2].YLookup[2] = 12;
+	TileLookupInfos[2].YLookup[1] = tile_set3.map->w;
+	TileLookupInfos[2].YLookup[2] = TileLookupInfos[2].YLookup[1] * 2;
 
 
 
@@ -137,7 +136,7 @@ void InitTileSets()
 		{
 			for (int x = 0; x < 3; x++)
 			{
-				TileAttribLookup[i][y][x] = TILE_ATTR_FULL(set1->Palette, FALSE, FALSE, FALSE, set1->Image->map->tilemap[set1->YLookup[y] + tileNumber + x] + indx);
+				TileAttribLookup[i][y][x] = TILE_ATTR_FULL(set1->Palette, tileToDraw->Priority , FALSE, FALSE, set1->Image->map->tilemap[set1->YLookup[y] + tileNumber + x] + indx);
 			}
 		}
 	}
@@ -424,4 +423,16 @@ void UpdateTile(u16 metaX, u16 metaY,  u16 tileId)
 
 
 	SetTile(metaX, metaY, planX, planY);
+}
+
+u8 OnScreen(u16 metaX, u16 metaY)
+{
+	if (metaX >= _metaTileXStart && metaX <= (_metaTileXStart + 14))
+	{		
+		if (metaY >= _metaTileYStart && metaY <= (_metaTileYStart + 10))
+		{
+			return TRUE;
+		}
+	}
+	return FALSE;
 }

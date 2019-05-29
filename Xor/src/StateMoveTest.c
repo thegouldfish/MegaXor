@@ -2,7 +2,6 @@
 
 #include "Map.h"
 #include "StateMoveTest.h"
-#include "Globals.h"
 #include "PadHelper.h"
 #include "TileDefinitions.h"
 

@@ -75,6 +75,18 @@
     <ClInclude Include="src\StateSelectLevel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\BombH.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Explosion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BombV.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommonLogic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="res\gfx.res">
@@ -137,6 +149,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\StateSelectLevel.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BombH.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Explosion.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BombV.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommonLogic.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

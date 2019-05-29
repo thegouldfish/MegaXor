@@ -5,6 +5,12 @@
 #include "TileDefinitions.h"
 #include "Xor.h"
 #include "Players.h"
+
+#include "BombH.h"
+#include "BombV.h"
+#include "Explosion.h"
+#include "CommonLogic.h"
+
 #include "../res/sprite.h"
 
 static ActiveTileItem _fishTile;
@@ -49,63 +55,6 @@ void FishSetup()
 
 
 
-
-
-
-
-static void DoMovement(u8 x, u8 y, u8 newX, u8 newY, u8 direction, u8 trackedId)
-{
-	_fishTile.CurrentMetaX = x;
-	_fishTile.CurrentMetaY = y;
-
-	_fishTile.DestinationMetaX = newX;
-	_fishTile.DestinationMetaY = newY;
-
-
-	_fishTile.DestinationScreenX = newX * 24;
-	_fishTile.DestinationScreenY = newY * 24;
-
-
-	_fishTile.MoveRemaining = fix32Add(MovementPerFrame, FIX32(24));
-	_fishTile.MoveDirection = direction;
-
-	_fishTile.IsActive = TRUE;
-
-	CurrentMapDataState[MAP_XY_TO_TILE(x, y)] = TILE_TYPE_FLOOR;
-	FishUpdateMovement();
-
-	_fishes[trackedId].Active = TRUE;
-
-	UpdateTile(_fishTile.CurrentMetaX, _fishTile.CurrentMetaY, TILE_TYPE_FLOOR);
-
-
-	for (u8 i = 0; i < _fishCount; i++)
-	{
-		if (_fishes[i].X == x && _fishes[i].Y == y)
-		{
-			_fishTile.ActiveIndex = i;
-			break;
-		}
-	}
-}
-
-
-
-static u8 FindId(u16 x, u16 y)
-{
-	for (u8 i = 0; i < _fishCount; i++)
-	{
-		if (_fishes[i].X == -x && _fishes[i].Y == y)
-		{
-			return i;
-		}
-	}
-
-	return 0;
-}
-
-
-
 u8 FishPushLeft(u16 x, u16 y)
 {
 	u16 xCheck = x - 1;
@@ -120,6 +69,7 @@ u8 FishPushLeft(u16 x, u16 y)
 		case TILE_TYPE_FORCEFIELD_H:
 		case TILE_TYPE_FLOOR:
 			canMove = TRUE;
+			break;
 
 
 		default:
@@ -130,7 +80,7 @@ u8 FishPushLeft(u16 x, u16 y)
 
 	if (canMove)
 	{
-		DoMovement(x, y, xCheck, y, MOVE_DIRECTION_LEFT, FindId(x,y));
+		DoMovementCommon(x, y, xCheck, y, MOVE_DIRECTION_LEFT, FindId(x, y, _fishes, _fishCount), &_fishTile, _fishes);
 	}
 
 	return canMove;
@@ -154,7 +104,7 @@ u8 FishPushRight(u16 x, u16 y)
 		case TILE_TYPE_FORCEFIELD_H:
 		case TILE_TYPE_FLOOR:
 			canMove = TRUE;
-
+			break;
 
 		default:
 			break;
@@ -164,7 +114,7 @@ u8 FishPushRight(u16 x, u16 y)
 
 	if (canMove)
 	{
-		DoMovement(x, y, xCheck, y, MOVE_DIRECTION_RIGHT, FindId(x, y));
+		DoMovementCommon(x, y, xCheck, y, MOVE_DIRECTION_RIGHT, FindId(x, y, _fishes, _fishCount), &_fishTile, _fishes);
 	}
 
 	return canMove;
@@ -177,14 +127,10 @@ u8 FishPushRight(u16 x, u16 y)
 static u8 CanMoveDown(u8 x, u8 y, u8 trackedId)
 {
 	u16 yCheck = y + 1;
-
 	
 	u8 tile = CurrentMapDataState[MAP_XY_TO_TILE(x, yCheck)];
-
 	u8 canMove = FALSE;
-
 	u8 canKill = _fishes[trackedId].Active;
-
 
 
 	switch (tile)
@@ -192,6 +138,30 @@ static u8 CanMoveDown(u8 x, u8 y, u8 trackedId)
 		case TILE_TYPE_FORCEFIELD_V:
 		case TILE_TYPE_FLOOR:
 			canMove = TRUE;
+			break;
+
+
+
+		case TILE_TYPE_BOMB_H:
+		case TILE_TYPE_BOMB_V:
+			if (canKill)
+			{
+				if (tile == TILE_TYPE_BOMB_H)
+				{
+					TriggerBombH(x, yCheck);
+				}
+				else if (tile == TILE_TYPE_BOMB_V)
+				{
+					TriggerBombV(x, yCheck);
+				}
+
+				_fishes[trackedId].X = -1;
+				_fishes[trackedId].Y = -1;
+				_fishes[trackedId].Active = FALSE;
+				PlaceExplosion(x, y);
+				canMove = FALSE;
+			}
+			break;
 
 
 		default:
@@ -207,7 +177,7 @@ static u8 CanMoveDown(u8 x, u8 y, u8 trackedId)
 
 	if (canMove)
 	{
-		DoMovement(x, y, x, yCheck, MOVE_DIRECTION_DOWN, trackedId);
+		DoMovementCommon(x, y, x, yCheck, MOVE_DIRECTION_DOWN, FindId(x, y, _fishes, _fishCount), &_fishTile, _fishes);
 	}
 
 	return canMove;
@@ -215,66 +185,7 @@ static u8 CanMoveDown(u8 x, u8 y, u8 trackedId)
 
 u8 FishUpdateMovement()
 {
-	u8 done = TRUE;
-
-	if (_fishTile.IsActive)
-	{	
-		_fishTile.MoveRemaining = fix32Sub(_fishTile.MoveRemaining, MovementPerFrame);
-
-		if (fix32ToInt(_fishTile.MoveRemaining) < 0)
-		{
-			_fishTile.MoveRemaining = 0;
-		}
-		else
-		{
-			done = FALSE;
-		}
-
-		u16 x = 0;
-		u16 y = 0;
-		switch (_fishTile.MoveDirection)
-		{
-
-			case MOVE_DIRECTION_LEFT:
-			{
-				y = _fishTile.DestinationScreenY;
-				x = _fishTile.DestinationScreenX + fix32ToInt(_fishTile.MoveRemaining);
-				break;
-			}
-
-			case MOVE_DIRECTION_RIGHT:
-			{
-				y = _fishTile.DestinationScreenY;
-				x = _fishTile.DestinationScreenX - fix32ToInt(_fishTile.MoveRemaining);
-				break;
-			}
-
-			case MOVE_DIRECTION_DOWN:
-			{
-				y = _fishTile.DestinationScreenY - fix32ToInt(_fishTile.MoveRemaining);
-				x = _fishTile.DestinationScreenX;
-				break;
-			}
-
-			default:
-				break;
-		}
-
-		//KLog_U3("fish direction ",_fishTile.MoveDirection, " fish x ", x, " fish y ", y);
-		//KLog_F1("MoveRemaining ", _fishTile.MoveRemaining);
-
-
-		x += CameraXOffset;
-		y += CameraYOffset;
-
-		//KLog_U2("Offsets fish x ", x, " fish y ", y);
-
-		SPR_setPosition(_fishTile.ActiveSprite, x, y);
-		SPR_setVisibility(_fishTile.ActiveSprite, VISIBLE);		
-		SPR_update();
-	}
-
-	return done;
+	return UpdateMovementCommon(&_fishTile);
 }
 
 void FishFinishMovement()
@@ -289,18 +200,24 @@ void FishFinishMovement()
 
 
 		_fishTile.IsActive = FALSE;
-		CurrentMapDataState[MAP_XY_TO_TILE(_fishTile.DestinationMetaX, _fishTile.DestinationMetaY)] = TILE_TYPE_FISH;
-		UpdateTile(_fishTile.DestinationMetaX, _fishTile.DestinationMetaY, TILE_TYPE_FISH);
-		SPR_setVisibility(_fishTile.ActiveSprite, HIDDEN);		
+
+		if (_fishTile.OnScreen)
+		{
+			UpdateTile(_fishTile.DestinationMetaX, _fishTile.DestinationMetaY, TILE_TYPE_FISH);
+			SPR_setVisibility(_fishTile.ActiveSprite, HIDDEN);
+
+		}
+		else
+		{
+			CurrentMapDataState[MAP_XY_TO_TILE(_fishTile.DestinationMetaX, _fishTile.DestinationMetaY)] = TILE_TYPE_FISH;
+		}
 
 		if (CurrentPlayer->MetaX == _fishTile.DestinationMetaX && CurrentPlayer->MetaY == _fishTile.DestinationMetaY)
 		{
-			KLog("Fish Killing Current Player");
 			PlayerKillCurrent();
 		}
 		else if (tile == TILE_TYPE_MAGNUS || tile == TILE_TYPE_QUESTOR)
 		{
-			KLog("Fish Killing Other Player");
 			PlayerKillOther();
 		}
 	}

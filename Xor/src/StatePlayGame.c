@@ -4,7 +4,6 @@
 
 #include "Map.h"
 #include "StatePlayGame.h"
-#include "Globals.h"
 #include "PadHelper.h"
 #include "TileDefinitions.h"
 
@@ -14,8 +13,11 @@
 #include "Players.h"
 #include "FishLogic.h"
 #include "ChickenLogic.h"
+#include "Explosion.h"
+#include "BombH.h"
+#include "BombV.h"
 
-#include "Globals.h"
+
 #include "StateSelectLevel.h"
 
 
@@ -78,7 +80,11 @@ void SetNumbers(int number, Sprite* sprites[], const int size)
 
 
 
-static void GenerateTiles2()
+// The minimap is made up of 32 x 32 pixels
+// aka 4 x 4 tiles.
+// this code will at the current state of the map data then set 1 pixel for each "map tile".
+// which basically means bitshifting lots of colour data into the tile.
+static void GenerateMiniMap()
 {
 	u16 yStart = 0;
 	u16 xStart = 0;
@@ -86,14 +92,13 @@ static void GenerateTiles2()
 	u32 tileSet[8];
 
 	u16 tileOffset = 0;
-	MapVramIndex = VramTileIndex;
 
-	for (u16 tt = 0; tt < 4; tt++)
+	for (u16 miniMapTileY = 0; miniMapTileY < 4; miniMapTileY++)
 	{
-		for (u16 ss = 0; ss < 4; ss++)
+		for (u16 miniMapTileX = 0; miniMapTileX < 4; miniMapTileX++)
 		{
-			xStart = ss << 3;
-			yStart = tt << 3;
+			xStart = miniMapTileX << 3;
+			yStart = miniMapTileY << 3;
 			memset(tileSet, 0, 8 * 4);
 
 			for (u16 y = yStart; y < yStart + 8; y++)
@@ -120,11 +125,13 @@ static void GenerateTiles2()
 				}
 			}
 
-			VDP_loadTileData((const u32 *)tileSet, VramTileIndex + tileOffset, 1, DMA);
+			VDP_loadTileData((const u32 *)tileSet, MapVramIndex + tileOffset, 1, DMA);
 			tileOffset++;
 		}
 	}
 }
+
+
 
 
 void StatePlayGame_Start()
@@ -172,6 +179,10 @@ void StatePlayGame_Start()
 	PlayersSetup();	
 	FishSetup();
 	ChickenSetup();
+	BombHSetup();
+	BombVSetup();
+
+	ExplosionSetup();
 	
 	VDP_waitVSync();
 	RedrawScreen(CurrentPlayer->ScreenMetaX , CurrentPlayer->ScreenMetaY);
@@ -179,7 +190,10 @@ void StatePlayGame_Start()
 	PlayerState = PLAYER_STATE_WAITING;
 
 
-	GenerateTiles2();
+	MapVramIndex = VramTileIndex;
+	GenerateMiniMap();
+	VramTileIndex += 16;
+
 	SYS_enableInts();
 
 	UpdatePlans();
@@ -209,11 +223,51 @@ void StatePlayGame_Start()
 	VDP_fadeIn(0, (4 * 16) - 1, GameScreenPalette, 10, FALSE);
 }
 
-u8 _whoopsTimer = 120;
-
+static u8 _whoopsTimer = 120;
+static u8 _waitTimer = 1;
+static u8 _horizontalFrame = 0;
 void StatePlayGame_Update()
 {
 	
+	_waitTimer--;
+	if (_waitTimer == 0)
+	{
+		_horizontalFrame++;
+		if (_horizontalFrame > 3)
+		{
+			_horizontalFrame = 0;
+		}
+
+
+		// Animiate H forcefield
+		u16 index = TILE_USERINDEX + 6;
+		u32* tilePtr = Forcefield_H_anim.tileset->tiles;
+		tilePtr += (_horizontalFrame * 24);
+		for (int i = 0; i < 3; i++)
+		{
+		 	VDP_loadTileData(tilePtr, index, 3, CPU);
+			index += 18;
+			tilePtr += 96;
+		}
+
+
+
+
+
+		// Animiate H forcefield
+		index = TILE_USERINDEX + 9;
+		tilePtr = Forcefield_V_anim.tileset->tiles;
+		tilePtr += (_horizontalFrame * 24);
+		for (int i = 0; i < 3; i++)
+		{
+			VDP_loadTileData(tilePtr, index, 3, CPU);
+			index += 18;
+			tilePtr += 96;
+		}
+
+
+		_waitTimer = 16;
+	}
 
 	if (_previousMapCount != MapsCollected)
 	{
@@ -249,7 +303,6 @@ void StatePlayGame_Update()
 		_previousMapCount = MapsCollected;
 	}
 	
-	//KLog_U1("Player State ", PlayerState);
 	switch (PlayerState)
 	{
 		
@@ -322,7 +375,9 @@ void StatePlayGame_Update()
 		{
 			PlayerUpdateMove(FALSE);
 			FishUpdateMovement();
-			ChickenUpdateMovement();		
+			ChickenUpdateMovement();
+			BombHUpdateMovement();
+			BombVUpdateMovement();
 
 			UpdatePlans();
 			SPR_setPosition(_player, CurrentPlayer->ScreenX, CurrentPlayer->ScreenY);
@@ -335,10 +390,13 @@ void StatePlayGame_Update()
 			PlayerEndMove();
 			FishFinishMovement();
 			ChickenFinishMovement();
+			BombVFinishMovement();
+			BombHFinishMovement();
+
 			if (MasksCollected != _previousMasksCollected)
 			{
 				_previousMasksCollected = MasksCollected;
-				GenerateTiles2();
+				GenerateMiniMap();
 				SetNumbers(MasksCollected, _masksCollected, 2);
 			}
 
@@ -350,7 +408,18 @@ void StatePlayGame_Update()
 		{			
 			if (_moveType == MOVED_VERTICALLY)
 			{
-				if (ChickenUpdateLogic())
+				if (BombVUpdateLogic())
+				{
+					KLog("MOVED_VERTICALLY - BombVUpdateLogic TRUE");
+					PlayerState = PLAYER_STATE_TILE_UPDATE;
+				}
+				else if (BombHUpdateLogic())
+				{
+					KLog("MOVED_VERTICALLY - BombHUpdateLogic TRUE");
+					PlayerState = PLAYER_STATE_TILE_UPDATE;
+					_moveType = MOVED_NONE;
+				}
+				else if (ChickenUpdateLogic())
 				{
 					PlayerState = PLAYER_STATE_TILE_UPDATE;
 				}
@@ -358,7 +427,7 @@ void StatePlayGame_Update()
 				{
 					_moveType = MOVED_NONE;
 					PlayerState = PLAYER_STATE_TILE_UPDATE;
-				}
+				}				
 				else
 				{
 					if (!_playerDead)
@@ -374,14 +443,25 @@ void StatePlayGame_Update()
 			}
 			else
 			{
-				if (FishUpdateLogic())
+				if (BombHUpdateLogic())
+				{
+					KLog("MOVED_HORIZONTALLY - BombHUpdateLogic TRUE");
+					PlayerState = PLAYER_STATE_TILE_UPDATE;
+				}
+				else if (BombVUpdateLogic())
+				{
+					KLog("MOVED_HORIZONTALLY - BombVUpdateLogic TRUE");
+					PlayerState = PLAYER_STATE_TILE_UPDATE;
+					_moveType = MOVED_NONE;
+				}
+				else if (FishUpdateLogic())
 				{
 					PlayerState = PLAYER_STATE_TILE_UPDATE;
 				}
 				else if (ChickenUpdateLogic())
 				{
 					PlayerState = PLAYER_STATE_TILE_UPDATE;
-				}
+				}				
 				else
 				{
 					if (!_playerDead)
@@ -395,16 +475,28 @@ void StatePlayGame_Update()
 					}
 				}
 			}
+
+			
+			if (ExplosionsNeeded())
+			{
+				PlayerState = PLAYER_STATE_TILE_UPDATE;
+			}
+			
 			break;
 		}
 
 		case PLAYER_STATE_TILE_UPDATE:
 		{
+			KLog("PLAYER_STATE_TILE_UPDATE");
 			u8 allDone = TRUE;
-
+			
 			allDone = allDone && FishUpdateMovement();
 			allDone = allDone && ChickenUpdateMovement();
+			allDone = allDone && BombHUpdateMovement();
+			allDone = allDone && BombVUpdateMovement();
+			
 
+			allDone = allDone && ExplosionUpdate();
 			
 			if (allDone)
 			{
@@ -416,13 +508,15 @@ void StatePlayGame_Update()
 
 		case PLAYER_STATE_TILE_FINISHED:
 		{
+			KLog("PLAYER_STATE_TILE_FINISHED");
+
 			FishFinishMovement();
 			ChickenFinishMovement();
+			BombVFinishMovement();
+			BombHFinishMovement();
 
 			if (BothDead())
 			{
-				KLog("Both dead");
-				KLog_U2("current alive: ", CurrentPlayer->Alive, " other player ", OtherPlayer->Alive);
 				_whoopsTimer = 120;
 				PlayerState = PLAYER_STATE_GAMEOVER;
 				SPR_setVisibility(_player, HIDDEN);
@@ -509,9 +603,6 @@ void StatePlayGame_Update()
 			break;
 		}
 	}
-
-
-	//KLog_U1("Ending state ", PlayerState);
 }
 
 void StatePlayGame_End()

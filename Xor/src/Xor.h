@@ -49,6 +49,8 @@ typedef struct
 
 	u8 ActiveIndex;
 
+	u8 OnScreen;
+
 	u16 CurrentMetaX;
 	u16 CurrentMetaY;
 

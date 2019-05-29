@@ -10,7 +10,8 @@ const static TileDefinition Wall =
 	0,
 	0,
 	TILE_PLAN_B,	
-	TILE_TYPE_WALL
+	TILE_TYPE_WALL,
+	FALSE
 };
 
 const static TileDefinition Floor =
@@ -20,7 +21,8 @@ const static TileDefinition Floor =
 	3,
 	0,
 	TILE_PLAN_B,
-	TILE_TYPE_FLOOR
+	TILE_TYPE_FLOOR,
+	FALSE
 };
 
 
@@ -31,7 +33,8 @@ const static TileDefinition ForceFieldH =
 	6,
 	0,
 	TILE_PLAN_A,
-	TILE_TYPE_FORCEFIELD_H
+	TILE_TYPE_FORCEFIELD_H,
+	FALSE
 };
 
 const static TileDefinition ForceFieldV =
@@ -41,7 +44,8 @@ const static TileDefinition ForceFieldV =
 	9,
 	0,
 	TILE_PLAN_A,
-	TILE_TYPE_FORCEFIELD_V
+	TILE_TYPE_FORCEFIELD_V,
+	FALSE
 };
 
 const static TileDefinition Xor =
@@ -51,7 +55,8 @@ const static TileDefinition Xor =
 	12,
 	0,
 	TILE_PLAN_A,
-	TILE_TYPE_XOR
+	TILE_TYPE_XOR,
+	FALSE
 };
 
 
@@ -62,7 +67,8 @@ const static TileDefinition Magus =
 	0,
 	0,
 	TILE_PLAN_A,
-	TILE_TYPE_MAGNUS	
+	TILE_TYPE_MAGNUS,
+	FALSE
 };
 
 
@@ -73,7 +79,8 @@ const static TileDefinition Exit =
 	0,
 	0,
 	TILE_PLAN_A,
-	TILE_TYPE_EXIT
+	TILE_TYPE_EXIT,
+	FALSE
 };
 
 const static TileDefinition Questor =
@@ -83,7 +90,8 @@ const static TileDefinition Questor =
 	3,
 	0,
 	TILE_PLAN_A,
-	TILE_TYPE_QUESTOR
+	TILE_TYPE_QUESTOR,
+	FALSE
 };
 
 const static TileDefinition Mapdef =
@@ -93,7 +101,8 @@ const static TileDefinition Mapdef =
 	3,
 	0,
 	TILE_PLAN_A,
-	TILE_TYPE_MAP
+	TILE_TYPE_MAP,
+	FALSE
 };
 
 
@@ -104,7 +113,8 @@ const static TileDefinition Fish =
 	6,
 	0,
 	TILE_PLAN_A,
-	TILE_TYPE_FISH
+	TILE_TYPE_FISH,
+	FALSE
 };
 
 const static TileDefinition Chicken =
@@ -114,8 +124,45 @@ const static TileDefinition Chicken =
 	9,
 	0,
 	TILE_PLAN_A,
-	TILE_TYPE_CHICKEN
+	TILE_TYPE_CHICKEN,
+	FALSE
 };
+
+
+const static TileDefinition BombH =
+{
+	11,
+	1,
+	12,
+	0,
+	TILE_PLAN_A,
+	TILE_TYPE_BOMB_H,
+	FALSE
+};
+
+const static TileDefinition BombV =
+{
+	12,
+	1,
+	15,
+	0,
+	TILE_PLAN_A,
+	TILE_TYPE_BOMB_V,
+	FALSE
+};
+
+
+const static TileDefinition Explosion =
+{
+	13,
+	0,
+	15,
+	0,
+	TILE_PLAN_A,
+	TILE_TYPE_EXPLOSION,
+	TRUE
+};
+
 
 const TileDefinition* Tiles[TILECOUNT] =
 {
@@ -129,5 +176,8 @@ const TileDefinition* Tiles[TILECOUNT] =
 	&Questor,
 	&Mapdef,
 	&Fish,
-	&Chicken
+	&Chicken,
+	&BombH,
+	&BombV,
+	&Explosion
 };

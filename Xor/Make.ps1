@@ -9,7 +9,7 @@ param
     [String]$SourceLocation = "",
     [String]$AssemblyName = "",
     [String]$Flavour = "Release",
-    [String]$SGDK = "E:\Programming\sgdk134" # Set me
+    [String]$SGDK = "E:\Programming\MegaDrive\sgdk140" # Set me
 )
 
 if(-not $Action)

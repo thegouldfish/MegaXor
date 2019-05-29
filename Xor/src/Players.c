@@ -7,6 +7,7 @@
 #include "Xor.h"
 #include "FishLogic.h"
 #include "ChickenLogic.h"
+#include "BombH.h"
 
 // externs
 u8 PlayerState = PLAYER_STATE_WAITING;
@@ -390,6 +391,13 @@ void PlayerMoveLeft()
 				canMove = TRUE;
 			}
 			break;
+
+		case TILE_TYPE_BOMB_H:
+			if (BombHPushLeft(x, CurrentPlayer->MetaY))
+			{
+				canMove = TRUE;
+			}
+			break;
 	}
 
 	if (canMove)
@@ -426,6 +434,13 @@ void PlayerMoveRight()
 
 		case TILE_TYPE_FISH:
 			if (FishPushRight(x, CurrentPlayer->MetaY))
+			{
+				canMove = TRUE;
+			}
+			break;
+
+		case TILE_TYPE_BOMB_H:
+			if (BombHPushRight(x, CurrentPlayer->MetaY))
 			{
 				canMove = TRUE;
 			}

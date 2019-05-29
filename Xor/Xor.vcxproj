@@ -88,7 +88,11 @@
     <ClInclude Include="res\sound.h" />
     <ClInclude Include="res\sprite.h" />
     <ClInclude Include="src\ActiveTrackers.h" />
+    <ClInclude Include="src\BombH.h" />
+    <ClInclude Include="src\BombV.h" />
     <ClInclude Include="src\ChickenLogic.h" />
+    <ClInclude Include="src\CommonLogic.h" />
+    <ClInclude Include="src\Explosion.h" />
     <ClInclude Include="src\FishLogic.h" />
     <ClInclude Include="src\GameMaps.h" />
     <ClInclude Include="src\Globals.h" />
@@ -116,8 +120,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ActiveTrackers.c" />
+    <ClCompile Include="src\BombH.c" />
+    <ClCompile Include="src\BombV.c" />
     <ClCompile Include="src\boot\rom_head.c" />
     <ClCompile Include="src\ChickenLogic.c" />
+    <ClCompile Include="src\CommonLogic.c" />
+    <ClCompile Include="src\Explosion.c" />
     <ClCompile Include="src\FishLogic.c" />
     <ClCompile Include="src\GameMaps.c" />
     <ClCompile Include="src\main.c" />

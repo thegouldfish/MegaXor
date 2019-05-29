@@ -32,4 +32,6 @@ void UpdatePlans();
 
 void UpdateTile(u16 metaX, u16 metaY, u16 tileId);
 
+u8 OnScreen(u16 metaX, u16 metaY);
+
 #endif
