@@ -25,13 +25,13 @@ Find a download in the releases page.
 
 
 
-How to play
+##How to play##
 -----------
 Move the shield around with the D-Pad.
 Switch between the 2 Shields with A.
 
 
-How to Win
+##How to Win##
 ----------
 Collect all the tiles that look like the mask on the side then find the exit door.
 
@@ -39,20 +39,20 @@ Collect all the tiles that look like the mask on the side then find the exit doo
 
 
 
-History
+##History##
 -------
 
-v0.2
-	Level 4 added.
-	Horiztonal and Vertical Bombs added.
-	Map drawing speed improved.
-	Issue with moving tiles looping off screen fixed.
-	Added animated tiles for the horiztonal and vertical force fields.
-	Speed up game logic.
-	Fixed issue with main menu not looping.
-	Mini-map generated from the level and updated when masks are collected.
+###v0.2###
+* Level 4 added.
+* Horiztonal and Vertical Bombs added.
+* Map drawing speed improved.
+* Issue with moving tiles looping off screen fixed.
+* Added animated tiles for the horiztonal and vertical force fields.
+* Speed up game logic.
+* Fixed issue with main menu not looping.
+* Mini-map generated from the level and updated when masks are collected.
 
 
-V0.1
-	Added first 3 levels.
-	Added main menu.
+###V0.1###
+* Added first 3 levels.
+* Added main menu.
