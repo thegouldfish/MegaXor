@@ -26,21 +26,18 @@ Find a download in the releases page.
 
 
 ## How to play ##
------------
 Move the shield around with the D-Pad.
 Switch between the 2 Shields with A.
 
 
 ## How to Win ##
-----------
 Collect all the tiles that look like the mask on the side then find the exit door.
 
 
 
 
 
-## History ##
--------
+## Version History ##
 
 ### V0.2 ###
 * Level 4 added.
