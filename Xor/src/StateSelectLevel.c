@@ -11,15 +11,26 @@
 static s8 _previousSelection = 0;
 static s8 _currentSelection = 0;
 
+#define PALETTE_ANIMATION_COUNT 10
+static u32 _paletteAnimation[PALETTE_ANIMATION_COUNT];
+
+
+static u8 _paletteAnimationFrameCount = 3;
+static u8 _paletteAnimationFrameTimer = 0;
+
+static s16 _currentPaletteAnimationFrame = 0;
+static u8 _paletteAnimatingUp = TRUE;
+
 
 void SetBackingHighlight()
 {
-	for (u8 i = 0; i < 29; i++)
+	for (u8 i = 0; i < 28; i++)
 	{
 		VDP_setTileMapXY(PLAN_B, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, 13), 6 + i, _previousSelection + 8);
-		VDP_setTileMapXY(PLAN_B, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, 1), 6 + i, _currentSelection + 8);
+		VDP_setTileMapXY(PLAN_B, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, 1) , 6 + i, _currentSelection  + 8);
 	}
 }
+
 
 void SetNumberCharsEx(u32 number, char* buff, int size, char defaultChar)
 {
@@ -51,23 +62,38 @@ void SetNumberCharsEx(u32 number, char* buff, int size, char defaultChar)
 void StateLevelSelect_Start()
 {
 	SYS_disableInts();
-	VDP_setPaletteColors(0, (u16*)palette_black, 64);
 
 	SPR_reset();
 	VDP_resetScreen();
+
+	VDP_setPaletteColors(0, (u16*)palette_black, 64);
+
+
+	VDP_drawImageEx(PLAN_B, &levelSelect_Background, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, TILE_USERINDEX), 0, 0, FALSE, TRUE);
+
+	GameInteractionState = GAME_INTERACTION_STATE_NORMAL;
+
+
+	// Generate the colour shades from dark blue to light
+	// This is used for the highlight palette animation
+	fix32 start = FIX32(0x000072);
+	fix32 end = FIX32(0x0000FF);
+	fix32 range = fix32Sub(end, start);
+	fix32 div = fix32Div(range, FIX32(PALETTE_ANIMATION_COUNT));
 	
-	VDP_drawImage(PLAN_B, &levelSelect_Background, 0, 0);
+	for (int i = 0; i < PALETTE_ANIMATION_COUNT; i++)
+	{
+		_paletteAnimation[i] = RGB24_TO_VDPCOLOR(fix32ToInt(start));
+		start = fix32Add(start, div);
+	}
 
-	PlaySolution = FALSE;
-
-
-
+	// Draw the menu text to the screen
 	char text[30];
 	for (u8 i = 0; i < MAP_COUNT; i++)
 	{
 		memset(text, (int)' ', 30);
 		text[29] = 0;
-		SetNumberCharsEx(i, text, 3, '0');
+		SetNumberCharsEx(i + 1, text, 3, '0');
 		text[2] = ' ';
 
 		u16 len = strlen(GameMaps[i]->MapName);
@@ -83,10 +109,23 @@ void StateLevelSelect_Start()
 	SetBackingHighlight();
 
 
-	VDP_drawText(Version, 32, 28);
+	VDP_drawText(Version, 32, 26);
 
 	SYS_enableInts();
+
+
+
+	u16 palette[16];
+	memcpy(&palette[0], levelSelect_Background.palette->data, 16 * 2);
+
+	ResetPad(&Pad1);
+
+
+	// fade in
+	VDP_fadeIn(0, 15, palette, 10, FALSE);
 }
+
+
 
 void StateLevelSelect_Update()
 {
@@ -117,13 +156,15 @@ void StateLevelSelect_Update()
 	{
 		if (Pad1.C == PAD_RELEASED)
 		{
-			PlaySolution = TRUE;
+			GameInteractionState = GAME_INTERACTION_STATE_TEST_REPLAY;
 		}
 
 		SelectedLevel = _currentSelection;
 		StateMachineChange(&GameMachineState, &StatePlayGame);
 	}	
 }
+
+
 
 void StateLevelSelect_End()
 {
@@ -132,9 +173,43 @@ void StateLevelSelect_End()
 
 
 
+
+void StateLevelSelect_VInt()
+{
+	_paletteAnimationFrameTimer++;
+
+	if (_paletteAnimationFrameTimer > _paletteAnimationFrameCount)
+	{
+		if (_paletteAnimatingUp)
+		{
+			_currentPaletteAnimationFrame++;
+			if (_currentPaletteAnimationFrame >= PALETTE_ANIMATION_COUNT)
+			{
+				_currentPaletteAnimationFrame = PALETTE_ANIMATION_COUNT - 2;
+				_paletteAnimatingUp = FALSE;
+			}
+		}
+		else
+		{
+			_currentPaletteAnimationFrame--;
+			if (_currentPaletteAnimationFrame < 0)
+			{
+				_currentPaletteAnimationFrame = 1;
+				_paletteAnimatingUp = TRUE;
+			}
+		}
+
+		_paletteAnimationFrameTimer = 0;
+
+		VDP_setPaletteColor(1, _paletteAnimation[_currentPaletteAnimationFrame]);
+	}
+}
+
+
 const SimpleState StateLevelSelect =
 {
 	StateLevelSelect_Start,
 	StateLevelSelect_Update,
-	StateLevelSelect_End
+	StateLevelSelect_End,
+	StateLevelSelect_VInt
 };

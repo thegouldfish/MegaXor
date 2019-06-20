@@ -4,6 +4,7 @@
 #include "Map.h"
 #include "TileDefinitions.h"
 #include "Players.h"
+#include "UI.h"
 
 #include "../res/gfx.h"
 
@@ -64,7 +65,8 @@ u8 ExplosionUpdate()
 					}
 				}
 
-				KLog("Explosions complete");
+				
+				ExplosionHappenedUI();
 				_explosionCount = 0;
 				return TRUE;
 			}
@@ -79,7 +81,7 @@ u8 ExplosionUpdate()
 				for (int i = 0; i < 3; i++)
 				{
 					VDP_loadTileData(tilePtr, index, 3, CPU);
-					index += 18;
+					index += TileIndexOffset;
 					tilePtr += 120;
 				}
 			}

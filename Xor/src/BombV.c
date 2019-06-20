@@ -19,11 +19,16 @@ static ActiveTileItem _bombVTile;
 static ActivePoint _bombVs[BOMBV_MAX];
 static u8 _bombVCount;
 
-void BombVSetup()
+
+void BombVMakeSprite()
 {
 	_bombVTile.ActiveSprite = SPR_addSprite(&sp_set2, 0, 0, TILE_ATTR(PAL1, TRUE, FALSE, FALSE));
 	SPR_setVisibility(_bombVTile.ActiveSprite, HIDDEN);
 	SPR_setFrame(_bombVTile.ActiveSprite, 1);
+}
+
+void BombVSetup()
+{
 	_bombVTile.IsActive = FALSE;
 
 
@@ -131,7 +136,7 @@ static u8 CanMoveLeft(u8 x, u8 y, u8 trackedId)
 	u8 canMove = FALSE;
 
 
-	u8 canKill = _bombVs[trackedId].Active;
+	u8 canKill = _bombVs[trackedId].Active == MOVE_DIRECTION_LEFT;
 
 
 
@@ -238,7 +243,7 @@ u8 BombVUpdateLogic()
 			}
 			else
 			{
-				_bombVs[i].Active = FALSE;
+				_bombVs[i].Active = MOVE_DIRECTION_NONE;
 			}
 		}
 	}

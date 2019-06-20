@@ -20,12 +20,18 @@ static ActivePoint _fishes[FISH_MAX];
 static u8 _fishCount;
 
 
-void FishSetup()
+void FishMakeSprite()
 {
 	_fishTile.ActiveSprite = SPR_addSprite(&ShieldSprites, 0, 0, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
 	SPR_setVisibility(_fishTile.ActiveSprite, HIDDEN);
 	SPR_setFrame(_fishTile.ActiveSprite, 2);
+}
+
+void FishSetup()
+{
+
 	_fishTile.IsActive = FALSE;
+	SPR_setVisibility(_fishTile.ActiveSprite, HIDDEN);
 
 
 
@@ -130,7 +136,7 @@ static u8 CanMoveDown(u8 x, u8 y, u8 trackedId)
 	
 	u8 tile = CurrentMapDataState[MAP_XY_TO_TILE(x, yCheck)];
 	u8 canMove = FALSE;
-	u8 canKill = _fishes[trackedId].Active;
+	u8 canKill = _fishes[trackedId].Active == MOVE_DIRECTION_DOWN;
 
 
 	switch (tile)
@@ -236,7 +242,7 @@ u8 FishUpdateLogic()
 			}
 			else
 			{
-				_fishes[i].Active = FALSE;
+				_fishes[i].Active = MOVE_DIRECTION_NONE;
 			}
 		}
 	}

@@ -8,6 +8,8 @@
 #include "FishLogic.h"
 #include "ChickenLogic.h"
 #include "BombH.h"
+#include "BombV.h"
+#include "DollLogic.h"
 
 // externs
 u8 PlayerState = PLAYER_STATE_WAITING;
@@ -42,6 +44,11 @@ static s16 _midY;
 
 void PlayersSetup()
 {
+	_xMoveLeft = FIX32(0);
+	_yMoveLeft = FIX32(0);
+	_cameraX = 0;
+	_cameraY = 0;
+
 	_midX = _drawWidth / 2;
 	_midY = screenHeight / 2;
 
@@ -310,6 +317,20 @@ void PlayerMoveDown()
 				canMove = TRUE;
 			}
 			break;
+
+		case TILE_TYPE_BOMB_V:
+			if (BombVPushDown(CurrentPlayer->MetaX, y))
+			{
+				canMove = TRUE;
+			}
+			break;
+
+		case TILE_TYPE_DOLL:
+			if (DollPushDown(CurrentPlayer->MetaX, y))
+			{
+				canMove = TRUE;
+			}
+			break;
 	}
 
 	if (canMove)
@@ -346,6 +367,21 @@ void PlayerMoveUp()
 
 		case TILE_TYPE_CHICKEN:
 			if (ChickenPushUp(CurrentPlayer->MetaX, y))
+			{
+				canMove = TRUE;
+			}
+			break;
+
+
+		case TILE_TYPE_BOMB_V:
+			if (BombVPushUp(CurrentPlayer->MetaX, y))
+			{
+				canMove = TRUE;
+			}
+			break;
+
+		case TILE_TYPE_DOLL:
+			if (DollPushUp(CurrentPlayer->MetaX, y))
 			{
 				canMove = TRUE;
 			}
@@ -398,6 +434,13 @@ void PlayerMoveLeft()
 				canMove = TRUE;
 			}
 			break;
+
+		case TILE_TYPE_DOLL:
+			if (DollPushLeft(x, CurrentPlayer->MetaY))
+			{
+				canMove = TRUE;
+			}
+			break;
 	}
 
 	if (canMove)
@@ -441,6 +484,13 @@ void PlayerMoveRight()
 
 		case TILE_TYPE_BOMB_H:
 			if (BombHPushRight(x, CurrentPlayer->MetaY))
+			{
+				canMove = TRUE;
+			}
+			break;
+
+		case TILE_TYPE_DOLL:
+			if (DollPushRight(x, CurrentPlayer->MetaY))
 			{
 				canMove = TRUE;
 			}
@@ -490,14 +540,12 @@ void PlayerChange()
 void PlayerKillCurrent()
 {
 	CurrentPlayer->Alive = PLAYER_ALIVE_REPORT_NO;
-	KLog_U1("PlayerKillCurrent ", CurrentPlayer->Id);
 }
 
 
 void PlayerKillOther()
 {
 	OtherPlayer->Alive = PLAYER_ALIVE_REPORT_NO;
-	KLog_U1("PlayerKillOther ", OtherPlayer->Id);
 
 	CurrentMapDataState[MAP_XY_TO_TILE(OtherPlayer->MetaX, OtherPlayer->MetaY)] = TILE_TYPE_FLOOR;
 	UpdateTile(OtherPlayer->MetaX, OtherPlayer->MetaY, TILE_TYPE_FLOOR);

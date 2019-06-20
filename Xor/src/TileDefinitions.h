@@ -3,7 +3,7 @@
 
 #include <genesis.h>
 
-#define TILECOUNT 14
+#define TILECOUNT 15
 
 #define TILE_TYPE_WALL 0
 #define TILE_TYPE_FLOOR 1
@@ -24,6 +24,7 @@
 
 #define TILE_TYPE_EXPLOSION 13
 
+#define TILE_TYPE_DOLL 14
 
 #define TILE_PLAN_A 0
 #define TILE_PLAN_B 1

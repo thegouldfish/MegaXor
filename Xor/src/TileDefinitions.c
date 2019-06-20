@@ -31,7 +31,7 @@ const static TileDefinition ForceFieldH =
 	2,
 	0,
 	6,
-	0,
+	3,
 	TILE_PLAN_A,
 	TILE_TYPE_FORCEFIELD_H,
 	FALSE
@@ -42,7 +42,7 @@ const static TileDefinition ForceFieldV =
 	3,
 	0,
 	9,
-	0,
+	3,
 	TILE_PLAN_A,
 	TILE_TYPE_FORCEFIELD_V,
 	FALSE
@@ -164,6 +164,17 @@ const static TileDefinition Explosion =
 };
 
 
+const static TileDefinition Doll =
+{
+	14,
+	1,
+	18,
+	0,
+	TILE_PLAN_A,
+	TILE_TYPE_DOLL,
+	FALSE
+};
+
 const TileDefinition* Tiles[TILECOUNT] =
 {
 	&Wall,
@@ -179,5 +190,6 @@ const TileDefinition* Tiles[TILECOUNT] =
 	&Chicken,
 	&BombH,
 	&BombV,
-	&Explosion
+	&Explosion,
+	&Doll
 };

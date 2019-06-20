@@ -22,12 +22,17 @@ static u8 _chickenCount;
 static ActiveTileItem _chickenTile;
 
 
-void ChickenSetup()
+void ChickenMakeSprite()
 {
-	
 	_chickenTile.ActiveSprite = SPR_addSprite(&ShieldSprites, 0, 0, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
 	SPR_setVisibility(_chickenTile.ActiveSprite, HIDDEN);
 	SPR_setFrame(_chickenTile.ActiveSprite, 3);
+}
+
+void ChickenSetup()
+{
+	SPR_setVisibility(_chickenTile.ActiveSprite, HIDDEN);
+
 	_chickenTile.IsActive = FALSE;
 
 
@@ -128,7 +133,7 @@ static u8 CanMoveLeft(u8 x, u8 y, u8 trackedId)
 
 	u8 tile = CurrentMapDataState[MAP_XY_TO_TILE(xCheck, y)];
 	u8 canMove = FALSE;
-	u8 canKill = _chickens[trackedId].Active;
+	u8 canKill = _chickens[trackedId].Active == MOVE_DIRECTION_LEFT;
 
 	switch (tile)
 	{
@@ -199,6 +204,7 @@ void ChickenFinishMovement()
 		{
 			UpdateTile(_chickenTile.DestinationMetaX, _chickenTile.DestinationMetaY, TILE_TYPE_CHICKEN);
 			SPR_setVisibility(_chickenTile.ActiveSprite, HIDDEN);
+			SPR_update();
 		}
 		else
 		{
@@ -232,7 +238,7 @@ u8 ChickenUpdateLogic()
 			}
 			else
 			{
-				_chickens[i].Active = FALSE;
+				_chickens[i].Active = MOVE_DIRECTION_NONE;
 			}
 		}
 	}

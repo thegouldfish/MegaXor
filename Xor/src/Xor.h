@@ -12,7 +12,6 @@ extern StateMachine GameMachineState;
 extern Pad Pad1;
 
 extern u8 SelectedLevel;
-extern u8 PlaySolution;
 extern fix32 MovementPerFrame;
 
 
@@ -21,10 +20,17 @@ extern u16 CameraYOffset;
 
 extern char* Version;
 
+#define MOVE_DIRECTION_NONE 0
 #define MOVE_DIRECTION_UP 1
 #define MOVE_DIRECTION_DOWN 2
 #define MOVE_DIRECTION_LEFT 3
 #define MOVE_DIRECTION_RIGHT 4
+
+
+extern u8 GameInteractionState;
+#define GAME_INTERACTION_STATE_NORMAL 0
+#define GAME_INTERACTION_STATE_USER_REPLAY 1
+#define GAME_INTERACTION_STATE_TEST_REPLAY 2
 
 #define MAX_MOVE_COUNT 2000
 
@@ -43,6 +49,7 @@ typedef struct
 	u8 Active;
 }ActivePoint;
 
+
 typedef struct
 {
 	u8 IsActive;
@@ -56,10 +63,6 @@ typedef struct
 
 	u16 DestinationMetaX;
 	u16 DestinationMetaY;
-
-
-	u16 CurrentScreenX;
-	u16 CurrentScreenY;
 
 	u16 DestinationScreenX;
 	u16 DestinationScreenY;

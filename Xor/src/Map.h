@@ -20,6 +20,8 @@ extern u16 GameScreenPalette[64];
 
 extern u16 VramTileIndex;
 
+extern u8 TileIndexOffset;
+
 void InitTileSets();
 
 void LoadMap(u8 index);

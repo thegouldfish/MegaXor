@@ -18,13 +18,17 @@ static ActivePoint _bombHs[BOMBH_MAX];
 static u8 _bombHsCount;
 
 
-void BombHSetup()
+void BombHMakeSprite()
 {
 	_bombHsTile.ActiveSprite = SPR_addSprite(&sp_set2, 0, 0, TILE_ATTR(PAL1, TRUE, FALSE, FALSE));
 	SPR_setVisibility(_bombHsTile.ActiveSprite, HIDDEN);
 	SPR_setFrame(_bombHsTile.ActiveSprite, 0);
-	_bombHsTile.IsActive = FALSE;
+}
 
+void BombHSetup()
+{
+	_bombHsTile.IsActive = FALSE;
+	SPR_setVisibility(_bombHsTile.ActiveSprite, HIDDEN);
 
 
 	for (u8 i = 0; i < BOMBH_MAX; i++)
@@ -130,7 +134,7 @@ static u8 CanMoveDown(u8 x, u8 y, u8 trackedId)
 
 	u8 canMove = FALSE;
 
-	u8 canKill = _bombHs[trackedId].Active;
+	u8 canKill = _bombHs[trackedId].Active == MOVE_DIRECTION_DOWN;
 
 
 
@@ -232,7 +236,7 @@ u8 BombHUpdateLogic()
 			}
 			else
 			{
-				_bombHs[i].Active = FALSE;
+				_bombHs[i].Active = MOVE_DIRECTION_NONE;
 			}
 		}
 	}

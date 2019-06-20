@@ -3,7 +3,7 @@
 
 #include <genesis.h>
 
-
+void ChickenMakeSprite();
 void ChickenSetup();
 
 u8 ChickenPushUp(u16 x, u16 y);

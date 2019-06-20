@@ -3,7 +3,9 @@
 
 #include <genesis.h>
 
+void BombHMakeSprite();
 void BombHSetup();
+
 u8 BombHPushLeft(u16 x, u16 y);
 u8 BombHPushRight(u16 x, u16 y);
 u8 BombHUpdateMovement();

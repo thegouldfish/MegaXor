@@ -3,6 +3,8 @@
 
 #include <genesis.h>
 
+
+void BombVMakeSprite();
 void BombVSetup();
 
 u8 BombVPushUp(u16 x, u16 y);

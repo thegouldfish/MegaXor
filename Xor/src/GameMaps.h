@@ -10,7 +10,7 @@
 #define MAP_HEIGHT 32
 #define MAP_SIZE (MAP_STRIDE * MAP_HEIGHT)
 
-#define MAP_COUNT 4
+#define MAP_COUNT 7
 
 
 #define MAP_XY_TO_TILE(x, y) ((y << 5) + x)

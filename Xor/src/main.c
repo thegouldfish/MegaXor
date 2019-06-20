@@ -1,6 +1,7 @@
 #include <genesis.h>
 
 #include "Xor.h"
+#include "GameMaps.h"
 
 #include "StatePlayGame.h"
 #include "StateSelectLevel.h"
@@ -10,6 +11,10 @@
 StateMachine GameMachineState;
 Pad Pad1;
 
+void VInterrupt()
+{
+	StateMachineVInterrupt(&GameMachineState);
+}
 
 int main()
 {
@@ -29,8 +34,6 @@ int main()
 
 	VDP_setPlanSize(64, 64);
 	
-
-	
 	// Using a 64 x 64 plan and a window, so need to setup custom addresses
 	VDP_setHScrollTableAddress(0x9400);
 	VDP_setSpriteListAddress(0x9800);
@@ -42,7 +45,9 @@ int main()
 	
 
 	SPR_init(0, 0, 0);
-	//XGM_startPlay(xgm_1);
+
+	// Start the music
+	XGM_startPlay(xgm_1);
 	
     VDP_setPaletteColors(0, (u16*) palette_black, 64);
 
@@ -53,6 +58,13 @@ int main()
     SYS_enableInts();
 
 	SetupPad(&Pad1, JOY_1);		
+
+	for (int i = 0; i < MAP_COUNT; i++)
+	{
+		MapMoveCounts[i] = MAX_MOVE_COUNT;
+	}
+
+	SYS_setVIntCallback(VInterrupt);
 
 	StateMachineStart(&GameMachineState, &StateLevelSelect);
     while(TRUE)

@@ -30,7 +30,7 @@ u16 GameScreenPalette[64];
 u16 VramTileIndex = 0;
 
 
-
+u8 TileIndexOffset = 0;
 
 // Local variables
 static TileLookupInfo TileLookupInfos[4];
@@ -65,8 +65,6 @@ static u16 _screenRowA[3][PLAN_WIDTH];
 
 void InitTileSets()
 {
-	SYS_disableInts();
-
 	// Set palette to black
 	VDP_setPaletteColors(0, (u16*)palette_black, 63);
 
@@ -83,9 +81,9 @@ void InitTileSets()
 	TileLookupInfos[0].YLookup[1] = tile_set1.map->w;
 	TileLookupInfos[0].YLookup[2] = TileLookupInfos[0].YLookup[1] * 2;
 
-	KLog_U3("w ", tile_set1.map->w, "   1: ", TileLookupInfos[0].YLookup[1], "   2: ", TileLookupInfos[0].YLookup[2]);
-
 	VramTileIndex += tile_set1.tileset->numTile;
+
+	TileIndexOffset = tile_set1.map->w;
 
 	VDP_loadTileSet(tile_set2.tileset, VramTileIndex, DMA);
 	memcpy(&GameScreenPalette[16], tile_set2.palette->data, 32);
@@ -116,14 +114,6 @@ void InitTileSets()
 
 
 
-
-	// Load the Window
-	memcpy(&GameScreenPalette[48], window.palette->data, 32);
-	VDP_drawImageEx(PLAN_WINDOW, &window, TILE_ATTR_FULL(PAL3, FALSE, FALSE, FALSE, VramTileIndex), 36, 0, FALSE, DMA);
-	VramTileIndex += window.tileset->numTile;
-
-
-
 	// Create the tile attributes for each of the metatiles and put them into the lookup table
 	for (int i = 0; i < TILECOUNT; i++)
 	{
@@ -140,8 +130,6 @@ void InitTileSets()
 			}
 		}
 	}
-
-	SYS_enableInts();
 }
 
 

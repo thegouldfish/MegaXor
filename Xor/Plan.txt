@@ -6,9 +6,10 @@ To do
 * move game states out of player
 * tidy up player code
 * Speed up code
-* Add bombs killing players
-* Add Level 5
-* Add user initated replays
+
+
+
+
 
 Done
 ====
@@ -21,3 +22,17 @@ Done
 * Add death state
 * Add bombs
 * Add (and fix up) Level 4
+* Add Level 5
+* Fixed BombV being pushed up and down
+* Add bombs killing players
+* Doll Logic added
+* Level 6 added
+* Level 7 added
+* Fixed glitch on title screen
+* Made animated tiles less prone to glitching when tileset's change size
+* Move Force Field Animation into its own code file
+* Implement Reset
+* Move window and all code required for it into its own file
+* Added Pallete animation for selection backing on the level select screen
+* Implement Pause menu
+* Add user initated replays 

@@ -71,7 +71,7 @@
     <NMakeReBuildCommandLine>powershell -ExecutionPolicy Bypass $(ProjectDir)make.ps1 -Action "Rebuild" -SourceLocation $(ProjectDir) -OutFolder $(ProjectDir) -AssemblyName $(MSBuildProjectName) -ObjectFolder $(ProjectDir) -Flavour $(Configuration) </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>powershell -ExecutionPolicy Bypass $(ProjectDir)make.ps1 -Action "Clean" -SourceLocation $(ProjectDir) -OutFolder $(ProjectDir) -AssemblyName $(MSBuildProjectName) -ObjectFolder $(ProjectDir) -Flavour $(Configuration) -SGDK %SGDK%</NMakeCleanCommandLine>
     <IntDir>$(ProjectDir)out\</IntDir>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);E:\Programming\sgdk134\inc</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)..\sgdk140\inc</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <BuildLog>
@@ -92,8 +92,10 @@
     <ClInclude Include="src\BombV.h" />
     <ClInclude Include="src\ChickenLogic.h" />
     <ClInclude Include="src\CommonLogic.h" />
+    <ClInclude Include="src\DollLogic.h" />
     <ClInclude Include="src\Explosion.h" />
     <ClInclude Include="src\FishLogic.h" />
+    <ClInclude Include="src\ForceFields.h" />
     <ClInclude Include="src\GameMaps.h" />
     <ClInclude Include="src\Globals.h" />
     <ClInclude Include="src\Map.h" />
@@ -105,6 +107,7 @@
     <ClInclude Include="src\StatePlayGame.h" />
     <ClInclude Include="src\StateSelectLevel.h" />
     <ClInclude Include="src\TileDefinitions.h" />
+    <ClInclude Include="src\UI.h" />
     <ClInclude Include="src\Xor.h" />
   </ItemGroup>
   <ItemGroup>
@@ -125,8 +128,10 @@
     <ClCompile Include="src\boot\rom_head.c" />
     <ClCompile Include="src\ChickenLogic.c" />
     <ClCompile Include="src\CommonLogic.c" />
+    <ClCompile Include="src\DollLogic.c" />
     <ClCompile Include="src\Explosion.c" />
     <ClCompile Include="src\FishLogic.c" />
+    <ClCompile Include="src\ForceFields.c" />
     <ClCompile Include="src\GameMaps.c" />
     <ClCompile Include="src\main.c" />
     <ClCompile Include="src\Map.c" />
@@ -138,6 +143,7 @@
     <ClCompile Include="src\StatePlayGame.c" />
     <ClCompile Include="src\StateSelectLevel.c" />
     <ClCompile Include="src\TileDefinitions.c" />
+    <ClCompile Include="src\UI.c" />
     <ClCompile Include="src\Xor.c" />
     <Resource Include="src\boot\sega.s">
       <FileType>Text</FileType>

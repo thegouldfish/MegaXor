@@ -9,7 +9,7 @@ param
     [String]$SourceLocation = "",
     [String]$AssemblyName = "",
     [String]$Flavour = "Release",
-    [String]$SGDK = "E:\Programming\MegaDrive\sgdk140" # Set me
+    [String]$SGDK = "..\..\sgdk140" # Set me
 )
 
 if(-not $Action)
@@ -30,6 +30,7 @@ if(-not $SGDK)
     exit -1
 }
 
+$SGDK = Resolve-Path $SGDK
 
 $env:GDK = $SGDK.Replace('\','/')
 $env:GDK_WIN = $SGDK.Replace('/','\')
@@ -37,12 +38,11 @@ $env:Path = "$($env:Path);$($env:GDK_WIN)\bin"
 
 
 Write-Host "--== SGDK Compiler Script ==--"
-Write-Host "Action: $Action"
-Write-Host "SourceLocation: $SourceLocation"
-Write-Host "OutFolder: $OutFolder"
-Write-Host "AssemblyName: $AssemblyName"
-Write-Host "ObjectFolder: $ObjectFolder"
-Write-Host "Flavour: $Flavour"
+Write-Host "SGDK           : $SGDK"
+Write-Host "Action         : $Action"
+Write-Host "SourceLocation : $SourceLocation"
+Write-Host "AssemblyName   : $AssemblyName"
+Write-Host "Flavour        : $Flavour"
 
 
 

@@ -87,6 +87,15 @@
     <ClInclude Include="src\CommonLogic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\DollLogic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ForceFields.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="res\gfx.res">
@@ -161,6 +170,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\CommonLogic.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DollLogic.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ForceFields.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

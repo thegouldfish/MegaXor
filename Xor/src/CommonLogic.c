@@ -42,8 +42,11 @@ void DoMovementCommon(u8 x, u8 y, u8 newX, u8 newY, u8 direction, u8 trackedId, 
 	CurrentMapDataState[MAP_XY_TO_TILE(x, y)] = TILE_TYPE_FLOOR;
 	UpdateMovementCommon(activeTile);
 
-	items[trackedId].Active = TRUE;
-	activeTile->ActiveIndex = trackedId;
+	if (items != NULL)
+	{
+		items[trackedId].Active = direction;
+		activeTile->ActiveIndex = trackedId;
+	}
 
 	if (activeTile->OnScreen)
 	{
