@@ -39,6 +39,21 @@ Collect all the tiles that look like the mask on the side then find the exit doo
 
 ## Version History ##
 
+### V0.3 ###
+* Level 5 added
+* Level 6 added
+* Level 7 added
+* Doll logic added
+* Fixed BombV being pushed up and down
+* Fixed graphical glitch on title screen
+* Added Music
+* Fixed glitch on title screen
+* Implement Reset
+* backing on level select now animated
+* Implemented Pause menu
+* Add user initated replays 
+
+
 ### V0.2 ###
 * Level 4 added.
 * Horiztonal and Vertical Bombs added.
