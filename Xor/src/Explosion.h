@@ -8,6 +8,8 @@ u8 ExplosionUpdate();
 
 u8 ExplosionsNeeded();
 
+void TriggerExplosions();
+
 void PlaceExplosion(u16 x, u16 y);
 
 #endif

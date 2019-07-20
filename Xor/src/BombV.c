@@ -151,6 +151,15 @@ static u8 CanMoveLeft(u8 x, u8 y, u8 trackedId)
 		case TILE_TYPE_BOMB_V:
 			if (canKill)
 			{
+
+				if (tile == TILE_TYPE_BOMB_V)
+				{
+					if (CanMoveLeft(xCheck, y, FindId(xCheck, y, _bombVs, _bombVCount)))
+					{
+						return TRUE;
+					}
+				}
+
 				_bombVTile.IsActive = FALSE;
 
 				if (tile == TILE_TYPE_BOMB_H)
@@ -200,7 +209,7 @@ u8 BombVUpdateMovement()
 void BombVFinishMovement()
 {
 	if (_bombVTile.IsActive)
-	{
+	{		
 		_bombVs[_bombVTile.ActiveIndex].X = _bombVTile.DestinationMetaX;
 		_bombVs[_bombVTile.ActiveIndex].Y = _bombVTile.DestinationMetaY;
 
@@ -224,21 +233,19 @@ void BombVFinishMovement()
 		else if (tile == TILE_TYPE_MAGNUS || tile == TILE_TYPE_QUESTOR)
 		{
 			PlayerKillOther();
-		}
+		}		
 	}
 }
 
 
 u8 BombVUpdateLogic()
 {
-	KLog("BombVUpdateLogic");
 	for (u8 i = 0; i < _bombVCount; i++)
 	{
 		if (_bombVs[i].X != -1)
 		{
 			if (CanMoveLeft(_bombVs[i].X, _bombVs[i].Y, i))
 			{
-				KLog_U1(" Can move left ", i);
 				return TRUE;
 			}
 			else

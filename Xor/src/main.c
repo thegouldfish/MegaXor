@@ -18,7 +18,6 @@ void VInterrupt()
 
 int main()
 {
-	
     SYS_disableInts();
     VDP_setScreenWidth320();	
 

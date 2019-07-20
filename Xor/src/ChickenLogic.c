@@ -147,6 +147,8 @@ static u8 CanMoveLeft(u8 x, u8 y, u8 trackedId)
 		case TILE_TYPE_BOMB_V:
 			if (canKill)
 			{
+				CurrentMapDataState[MAP_XY_TO_TILE(x, y)] = TILE_TYPE_FLOOR;
+
 				if (tile == TILE_TYPE_BOMB_H)
 				{
 					TriggerBombH(xCheck, y);
@@ -224,6 +226,20 @@ void ChickenFinishMovement()
 	}
 }
 
+
+void KillChicken(u16 x, u16 y)
+{
+	KLog("Killing chicken");
+	s8 id = FindId(x, y, _chickens, _chickenCount);
+	
+	KLog_S1("Chicken id is ", id);
+	if (id != -1)
+	{
+		_chickens[id].X = -1;
+		_chickens[id].Y = -1;
+		_chickens[id].Active = FALSE;
+	}
+}
 
 u8 ChickenUpdateLogic()
 {

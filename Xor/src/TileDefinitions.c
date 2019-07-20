@@ -5,173 +5,169 @@
 
 const static TileDefinition Wall =
 {
-	0,
-	0,
-	0,
-	0,
-	TILE_PLAN_B,	
 	TILE_TYPE_WALL,
+	0,
+	0,
+	0,
+	TILE_PLAN_B,		
 	FALSE
 };
 
 const static TileDefinition Floor =
 {
-	1,
+	TILE_TYPE_FLOOR,
 	0,
 	3,
 	0,
 	TILE_PLAN_B,
-	TILE_TYPE_FLOOR,
 	FALSE
 };
 
 
 const static TileDefinition ForceFieldH =
 {
-	2,
+	TILE_TYPE_FORCEFIELD_H,
 	0,
 	6,
 	3,
 	TILE_PLAN_A,
-	TILE_TYPE_FORCEFIELD_H,
 	FALSE
 };
 
 const static TileDefinition ForceFieldV =
 {
-	3,
+	TILE_TYPE_FORCEFIELD_V,
 	0,
 	9,
 	3,
-	TILE_PLAN_A,
-	TILE_TYPE_FORCEFIELD_V,
+	TILE_PLAN_A,	
 	FALSE
 };
 
 const static TileDefinition Xor =
 {
-	4,
+	TILE_TYPE_XOR,
 	0,
 	12,
 	0,
-	TILE_PLAN_A,
-	TILE_TYPE_XOR,
+	TILE_PLAN_A,	
 	FALSE
 };
 
 
 const static TileDefinition Magus =
 {
-	5,
+	TILE_TYPE_MAGNUS,
 	2,
 	0,
 	0,
-	TILE_PLAN_A,
-	TILE_TYPE_MAGNUS,
+	TILE_PLAN_A,	
 	FALSE
 };
 
 
 const static TileDefinition Exit =
 {
-	6,
+	TILE_TYPE_EXIT,
 	1,
 	0,
 	0,
-	TILE_PLAN_A,
-	TILE_TYPE_EXIT,
+	TILE_PLAN_A,	
 	FALSE
 };
 
 const static TileDefinition Questor =
 {
-	7,
+	TILE_TYPE_QUESTOR,
 	2,
 	3,
 	0,
-	TILE_PLAN_A,
-	TILE_TYPE_QUESTOR,
+	TILE_PLAN_A,	
 	FALSE
 };
 
 const static TileDefinition Mapdef =
 {
-	8,
+	TILE_TYPE_MAP,
 	1,
 	3,
 	0,
 	TILE_PLAN_A,
-	TILE_TYPE_MAP,
 	FALSE
 };
 
 
 const static TileDefinition Fish =
 {
-	9,
+	TILE_TYPE_FISH,
 	1,
 	6,
 	0,
-	TILE_PLAN_A,
-	TILE_TYPE_FISH,
+	TILE_PLAN_A,	
 	FALSE
 };
 
 const static TileDefinition Chicken =
 {
-	10,
+	TILE_TYPE_CHICKEN,
 	1,
 	9,
 	0,
 	TILE_PLAN_A,
-	TILE_TYPE_CHICKEN,
 	FALSE
 };
 
 
 const static TileDefinition BombH =
 {
-	11,
+	TILE_TYPE_BOMB_H,
 	1,
 	12,
 	0,
-	TILE_PLAN_A,
-	TILE_TYPE_BOMB_H,
+	TILE_PLAN_A,	
 	FALSE
 };
 
 const static TileDefinition BombV =
 {
-	12,
+	TILE_TYPE_BOMB_V,
 	1,
 	15,
 	0,
-	TILE_PLAN_A,
-	TILE_TYPE_BOMB_V,
+	TILE_PLAN_A,	
 	FALSE
 };
 
 
 const static TileDefinition Explosion =
 {
-	13,
+	TILE_TYPE_EXPLOSION,
 	0,
 	15,
 	0,
-	TILE_PLAN_A,
-	TILE_TYPE_EXPLOSION,
+	TILE_PLAN_A,	
 	TRUE
 };
 
 
 const static TileDefinition Doll =
 {
-	14,
+	TILE_TYPE_DOLL,
 	1,
 	18,
 	0,
-	TILE_PLAN_A,
-	TILE_TYPE_DOLL,
+	TILE_PLAN_A,	
+	FALSE
+};
+
+
+const static TileDefinition Switch =
+{
+	TILE_TYPE_SWITCH,
+	0,
+	18,
+	0,
+	TILE_PLAN_A,	
 	FALSE
 };
 
@@ -191,5 +187,6 @@ const TileDefinition* Tiles[TILECOUNT] =
 	&BombH,
 	&BombV,
 	&Explosion,
-	&Doll
+	&Doll,
+	&Switch
 };

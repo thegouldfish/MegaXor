@@ -96,7 +96,7 @@ void StateMoveTest_Start()
 	{
 		for (int x = 0; x < 32; x++)
 		{
-			if (Tiles[CurrentMap->MapData[i]]->TileType == TILE_TYPE_MAGNUS)
+			if (CurrentMap->MapData[i] == TILE_TYPE_MAGNUS)
 			{
 				_playerX = x;
 				_playerY = y;

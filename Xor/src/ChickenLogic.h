@@ -11,6 +11,6 @@ u8 ChickenPushDown(u16 x, u16 y);
 u8 ChickenUpdateMovement();
 u8 ChickenUpdateLogic();
 void ChickenFinishMovement();
-
+void KillChicken(u16 x, u16 y);
 
 #endif

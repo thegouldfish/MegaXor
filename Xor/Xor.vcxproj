@@ -106,6 +106,7 @@
     <ClInclude Include="src\StateMoveTest.h" />
     <ClInclude Include="src\StatePlayGame.h" />
     <ClInclude Include="src\StateSelectLevel.h" />
+    <ClInclude Include="src\SwitchLogic.h" />
     <ClInclude Include="src\TileDefinitions.h" />
     <ClInclude Include="src\UI.h" />
     <ClInclude Include="src\Xor.h" />
@@ -142,6 +143,7 @@
     <ClCompile Include="src\StateMoveTest.c" />
     <ClCompile Include="src\StatePlayGame.c" />
     <ClCompile Include="src\StateSelectLevel.c" />
+    <ClCompile Include="src\SwitchLogic.c" />
     <ClCompile Include="src\TileDefinitions.c" />
     <ClCompile Include="src\UI.c" />
     <ClCompile Include="src\Xor.c" />

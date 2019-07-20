@@ -152,6 +152,7 @@ static u8 CanMoveDown(u8 x, u8 y, u8 trackedId)
 		case TILE_TYPE_BOMB_V:
 			if (canKill)
 			{
+				CurrentMapDataState[MAP_XY_TO_TILE(x, y)] = TILE_TYPE_FLOOR;
 				if (tile == TILE_TYPE_BOMB_H)
 				{
 					TriggerBombH(x, yCheck);
@@ -229,6 +230,27 @@ void FishFinishMovement()
 	}
 }
 
+void KillFish(u16 x, u16 y)
+{
+	KLog_U2("Killing a fish at : ", x, " , ", y);
+	s8 id = FindId(x, y, _fishes, _fishCount);
+	
+	KLog_S1("fish id ", id);
+	if (id != -1)
+	{
+		_fishes[id].X = -1;
+		_fishes[id].Y = -1;
+		_fishes[id].Active = FALSE;
+	}
+	else
+	{
+		KLog("All fishes");
+		for (int i = 0; i < FISH_MAX; i++)
+		{
+			KLog_U2("  fish x : ", _fishes[i].X, " y: ", _fishes[i].Y);
+		}
+	}
+}
 
 u8 FishUpdateLogic()
 {

@@ -10,4 +10,4 @@ u16 CameraYOffset;
 u8 GameInteractionState;
 
 
-char* Version = "V0.3";
+char* Version = "V0.4";

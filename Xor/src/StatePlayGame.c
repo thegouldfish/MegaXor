@@ -19,6 +19,7 @@
 #include "DollLogic.h"
 #include "ForceFields.h"
 #include "UI.h"
+#include "SwitchLogic.h"
 
 #include "StateSelectLevel.h"
 
@@ -62,12 +63,7 @@ void StatePlayGame_Start()
 	// Load basic tiles
 	InitTileSets();	
 	
-	_player = SPR_addSprite(&ShieldSprites, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
-	SPR_setFrame(_player, 0);
 
-
-	_playerUI = SPR_addSprite(&ShieldSprites, 292, 196, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
-	SPR_setFrame(_playerUI, 0);
 
 
 	_currentMoveCount = 0;
@@ -102,8 +98,15 @@ void StatePlayGame_Start()
 	
 	PlayerState = PLAYER_STATE_WAITING;
 
-
+	ResetSwitches();
 	
+	_player = SPR_addSprite(&ShieldSprites, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+	SPR_setFrame(_player, 0);
+
+
+	_playerUI = SPR_addSprite(&ShieldSprites, 292, 196, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
+	SPR_setFrame(_playerUI, 0);
+
 
 	UpdatePlans();
 	SPR_setPosition(_player, CurrentPlayer->ScreenX, CurrentPlayer->ScreenY);
@@ -154,7 +157,7 @@ void ResetGame(bool startReplay)
 	SetupForceFields();
 	ExplosionSetup();
 
-
+	ResetSwitches();
 	
 
 	FishSetup();
@@ -386,22 +389,25 @@ void UpdateGameLogic()
 
 		case PLAYER_STATE_TILE_LOGIC:
 		{
+			// Change move type to be the type of object that moved.
+			// so if chickens moved last time, they should try again first.
+
+
 			if (_moveType == MOVED_VERTICALLY)
 			{
 				if (BombVUpdateLogic())
 				{
-					KLog("MOVED_VERTICALLY - BombVUpdateLogic TRUE");
 					PlayerState = PLAYER_STATE_TILE_UPDATE;
 				}
 				else if (BombHUpdateLogic())
 				{
-					KLog("MOVED_VERTICALLY - BombHUpdateLogic TRUE");
 					PlayerState = PLAYER_STATE_TILE_UPDATE;
 					_moveType = MOVED_NONE;
 				}
 				else if (ChickenUpdateLogic())
 				{
 					PlayerState = PLAYER_STATE_TILE_UPDATE;
+					_moveType = MOVED_VERTICALLY;
 				}
 				else if (FishUpdateLogic())
 				{
@@ -429,22 +435,22 @@ void UpdateGameLogic()
 			{
 				if (BombHUpdateLogic())
 				{
-					KLog("MOVED_HORIZONTALLY - BombHUpdateLogic TRUE");
 					PlayerState = PLAYER_STATE_TILE_UPDATE;
 				}
 				else if (BombVUpdateLogic())
 				{
-					KLog("MOVED_HORIZONTALLY - BombVUpdateLogic TRUE");
 					PlayerState = PLAYER_STATE_TILE_UPDATE;
 					_moveType = MOVED_NONE;
 				}
 				else if (FishUpdateLogic())
 				{
 					PlayerState = PLAYER_STATE_TILE_UPDATE;
+					_moveType = MOVED_HORIZONTALLY;
 				}
 				else if (ChickenUpdateLogic())
 				{
 					PlayerState = PLAYER_STATE_TILE_UPDATE;
+					_moveType = MOVED_VERTICALLY;
 				}
 				else if (DollUpdateLogic())
 				{
@@ -475,7 +481,6 @@ void UpdateGameLogic()
 
 		case PLAYER_STATE_TILE_UPDATE:
 		{
-			KLog("PLAYER_STATE_TILE_UPDATE");
 			u8 allDone = TRUE;
 
 			allDone = allDone && FishUpdateMovement();
@@ -501,7 +506,8 @@ void UpdateGameLogic()
 			BombVFinishMovement();
 			BombHFinishMovement();
 			DollFinishMovement();
-
+			
+			TriggerExplosions();
 
 
 			if (BothDead() || StepsTaken >= MAX_MOVE_COUNT)

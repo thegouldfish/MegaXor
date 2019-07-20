@@ -9,6 +9,6 @@ u8 FishPushRight(u16 x, u16 y);
 u8 FishUpdateMovement();
 u8 FishUpdateLogic();
 void FishFinishMovement();
-
+void KillFish(u16 x, u16 y);
 
 #endif

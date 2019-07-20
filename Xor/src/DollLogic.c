@@ -9,6 +9,12 @@
 
 static ActiveTileItem _dollTile;
 
+
+//
+// Dolls will only move if pushed and will keep moving in the direction pushed till hitting an object.
+// They can't set off bombs
+//
+
 void DollSetup()
 {
 	_dollTile.ActiveSprite = SPR_addSprite(&sp_set2, 0, 0, TILE_ATTR(PAL1, TRUE, FALSE, FALSE));

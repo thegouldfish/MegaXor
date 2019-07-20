@@ -6,7 +6,7 @@
 
 
 
-u8 FindId(u16 x, u16 y, const ActivePoint* items, const int count)
+s8 FindId(u16 x, u16 y, const ActivePoint* items, const int count)
 {
 	for (u8 i = 0; i < count; i++)
 	{
@@ -16,7 +16,9 @@ u8 FindId(u16 x, u16 y, const ActivePoint* items, const int count)
 		}
 	}
 
-	return 0;
+	KLog_U2("Failed to find something at - x: ",x, " y: ", y);
+
+	return -1;
 }
 
 

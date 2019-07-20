@@ -55,13 +55,15 @@ static void SetNumbers(int number, Sprite* sprites[], const int size)
 
 // The minimap is made up of 32 x 32 pixels
 // aka 4 x 4 tiles.
-// this code will at the current state of the map data then set 1 pixel for each "map tile".
+// this code will look at the current state of the map data then set 1 pixel for each "map tile".
 // which basically means bitshifting lots of colour data into the tile.
 static void GenerateMiniMap()
 {
 	u16 yStart = 0;
 	u16 xStart = 0;
 
+	// a tile is made up of 8 lines, each line is 32bits in size
+	// which means each pixel needs 4bits (which gives us 16 colours)
 	u32 tileSet[8];
 
 	u16 tileOffset = 0;

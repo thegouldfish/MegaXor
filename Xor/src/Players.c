@@ -10,6 +10,7 @@
 #include "BombH.h"
 #include "BombV.h"
 #include "DollLogic.h"
+#include "SwitchLogic.h"
 
 // externs
 u8 PlayerState = PLAYER_STATE_WAITING;
@@ -52,8 +53,22 @@ void PlayersSetup()
 	_midX = _drawWidth / 2;
 	_midY = screenHeight / 2;
 
+
+	fix32 timeToMove = 0;
 	// How long in seconds it takes to move a square
-	fix32 timeToMove = FIX32(0.100);
+	
+	
+	if (GameInteractionState == GAME_INTERACTION_STATE_TEST_REPLAY)
+	{
+		timeToMove = FIX32(0.075);
+	}
+	else
+	{
+		timeToMove = FIX32(0.100);
+	}
+	
+
+	
 
 	// Movement timing for NTSC
 	fix32 divider = fix32Mul(timeToMove, FIX32(60));
@@ -78,17 +93,18 @@ void PlayersSetup()
 		{
 			for (int x = 0; x < 32; x++)
 			{
-				if (Tiles[CurrentMap->MapData[i]]->TileType == TILE_TYPE_MAGNUS)
+
+				if (CurrentMap->MapData[i] == TILE_TYPE_MAGNUS)
 				{
 					Players[0].MetaX = x;
 					Players[0].MetaY = y;
 				}
-				else if (Tiles[CurrentMap->MapData[i]]->TileType == TILE_TYPE_QUESTOR)
+				else if (CurrentMap->MapData[i] == TILE_TYPE_QUESTOR)
 				{
 					Players[1].MetaX = x;
 					Players[1].MetaY = y;
 				}
-				else if (Tiles[CurrentMap->MapData[i]]->TileType == TILE_TYPE_XOR)
+				else if (CurrentMap->MapData[i] == TILE_TYPE_XOR)
 				{
 					TotalMasks++;
 				}
@@ -282,6 +298,11 @@ void PlayerEndMove()
 			PlayerState = PLAYER_STATE_COMPLETE;
 			break;
 
+		case TILE_TYPE_SWITCH:
+			SwitchToggle(CurrentPlayer->MetaX, CurrentPlayer->MetaY);
+			PlayerState = PLAYER_STATE_TILE_LOGIC;
+			break;
+
 		default:
 			PlayerState = PLAYER_STATE_TILE_LOGIC;
 			break;
@@ -300,7 +321,8 @@ void PlayerMoveDown()
 		case TILE_TYPE_FLOOR:
 		case TILE_TYPE_FORCEFIELD_V:
 		case TILE_TYPE_MAP:
-		case TILE_TYPE_XOR:		
+		case TILE_TYPE_XOR:
+		case TILE_TYPE_SWITCH:
 			canMove = TRUE;
 			break;
 
@@ -355,6 +377,7 @@ void PlayerMoveUp()
 		case TILE_TYPE_FORCEFIELD_V:
 		case TILE_TYPE_MAP:
 		case TILE_TYPE_XOR:		
+		case TILE_TYPE_SWITCH:
 			canMove = TRUE;
 			break;
 
@@ -411,6 +434,7 @@ void PlayerMoveLeft()
 		case TILE_TYPE_FORCEFIELD_H:
 		case TILE_TYPE_MAP:
 		case TILE_TYPE_XOR:
+		case TILE_TYPE_SWITCH:
 			canMove = TRUE;
 			break;
 
@@ -464,7 +488,8 @@ void PlayerMoveRight()
 		case TILE_TYPE_FLOOR:
 		case TILE_TYPE_FORCEFIELD_H:
 		case TILE_TYPE_MAP:
-		case TILE_TYPE_XOR:		
+		case TILE_TYPE_XOR:	
+		case TILE_TYPE_SWITCH:
 			canMove = TRUE;
 			break;
 
