@@ -6,7 +6,8 @@ To do
 * move game states out of player
 * tidy up player code
 * Speed up code
-
+* refactor tile loading to make the rest of the code less hard coded
+* add in multiple tile sets
 
 
 
@@ -36,3 +37,21 @@ Done
 * Added Pallete animation for selection backing on the level select screen
 * Implement Pause menu
 * Add user initated replays 
+
+* Implement Switch tile type
+* Fix ordering of chicken's and fish dependent on what moved last
+
+* Added Teleporter
+* Added all the rest of the levels.
+* Further fixes to the order that fish, chicken and bombs move
+* Fixed off screen explositions showing on screen
+* Correctly kill other objects when exploded
+* Refactored graphics loading code
+* better handling of animated tiles
+* Added Options Menu
+* Added Sonic tile set
+* Added YouTuber tile set
+* Added Settings, score saving and loading
+* Added option to clear save
+* Fixed up teleport to handle blocked squares correctly
+* fixed broken player death

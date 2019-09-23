@@ -1,5 +1,5 @@
-#ifndef MAPS_
-#define MAPS_
+#ifndef _GAME_MAPS_
+#define _GAME_MAPS_
 
 #include <genesis.h>
 #include "Xor.h"
@@ -10,7 +10,7 @@
 #define MAP_HEIGHT 32
 #define MAP_SIZE (MAP_STRIDE * MAP_HEIGHT)
 
-#define MAP_COUNT 9
+#define MAP_COUNT 15
 
 
 #define MAP_XY_TO_TILE(x, y) ((y << 5) + x)

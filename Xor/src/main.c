@@ -5,6 +5,11 @@
 
 #include "StatePlayGame.h"
 #include "StateSelectLevel.h"
+#include "TileLoadTestState.h"
+
+#include "TileSets.h"
+
+#include "SaveGame.h"
 
 #include "../res/sound.h"
 
@@ -18,6 +23,12 @@ void VInterrupt()
 
 int main()
 {
+
+	
+
+	SelectedGraphicsSet = NULL;
+		//&tileGraphicsSet1;
+
     SYS_disableInts();
     VDP_setScreenWidth320();	
 
@@ -31,6 +42,7 @@ int main()
 		VDP_setScreenHeight224();
 	}
 
+	
 	VDP_setPlanSize(64, 64);
 	
 	// Using a 64 x 64 plan and a window, so need to setup custom addresses
@@ -58,14 +70,21 @@ int main()
 
 	SetupPad(&Pad1, JOY_1);		
 
-	for (int i = 0; i < MAP_COUNT; i++)
+	if (!ReadSaveIn())
 	{
-		MapMoveCounts[i] = MAX_MOVE_COUNT;
-	}
+		for (int i = 0; i < MAP_COUNT; i++)
+		{
+			MapMoveCounts[i] = MAX_MOVE_COUNT;
+		}
 
+		PlayerOptions.SelectedGraphics = 0;
+
+		WriteSaveOut();
+	}
 	SYS_setVIntCallback(VInterrupt);
 
 	StateMachineStart(&GameMachineState, &StateLevelSelect);
+	//StateMachineStart(&GameMachineState, &TileLoadTestState);
     while(TRUE)
     {
 		UpdatePad(&Pad1);

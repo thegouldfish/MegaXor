@@ -18,6 +18,8 @@ extern fix32 MovementPerFrame;
 extern u16 CameraXOffset;
 extern u16 CameraYOffset;
 
+extern u16 GamePalette[64];
+
 extern char* Version;
 
 #define MOVE_DIRECTION_NONE 0
@@ -75,5 +77,17 @@ typedef struct
 	Sprite * ActiveSprite;
 
 }ActiveTileItem;
+
+
+
+typedef struct
+{
+	u8 SelectedGraphics;
+
+
+}Options;
+
+
+extern Options PlayerOptions;
 
 #endif

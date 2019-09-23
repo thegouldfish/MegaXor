@@ -5,6 +5,8 @@
 #include "Xor.h"
 #include "Players.h"
 
+#include "TileLoading.h"
+
 #include "../res/gfx.h"
 #include "../res/sprite.h"
 
@@ -24,6 +26,10 @@ static Sprite* _moves[4];
 static Sprite* _upperUIElement;
 static Sprite* _middleUIElement;
 static Sprite* _lowerUIElement;
+
+
+static Sprite* _playerIcons[2];
+static Sprite* _MaskIcon;
 
 static void SetNumbers(int number, Sprite* sprites[], const int size)
 {
@@ -125,7 +131,7 @@ void SetupUI()
 
 
 	// Load the Window
-	memcpy(&GameScreenPalette[48], window.palette->data, 32);
+	memcpy(&GamePalette[48], window.palette->data, 32);
 	_windowVramIndex = VramTileIndex;
 	VramTileIndex += window.tileset->numTile;
 
@@ -143,7 +149,44 @@ void SetupUI()
 	SPR_setVisibility(_upperUIElement, HIDDEN);
 	SPR_setVisibility(_middleUIElement, HIDDEN);
 	SPR_setVisibility(_lowerUIElement, HIDDEN);
+
+
+	SPR_setDepth(_upperUIElement, SPR_MIN_DEPTH);
+	SPR_setDepth(_lowerUIElement, SPR_MIN_DEPTH);
+
+	
+	_playerIcons[0] = SPR_addSprite(LoadedTiles[TILE_TYPE_MAGNUS].GraphicsDefinition->Sprite, 292, 196, TILE_ATTR(LoadedTiles[TILE_TYPE_MAGNUS].GraphicsDefinition->Palette, FALSE, FALSE, FALSE));
+	SPR_setVisibility(_playerIcons[0], HIDDEN);
+	
+	_playerIcons[1] = SPR_addSprite(LoadedTiles[TILE_TYPE_QUESTOR].GraphicsDefinition->Sprite, 292, 196, TILE_ATTR(LoadedTiles[TILE_TYPE_QUESTOR].GraphicsDefinition->Palette, FALSE, FALSE, FALSE));
+	SPR_setVisibility(_playerIcons[1], HIDDEN);
+
+	
+	_MaskIcon = SPR_addSprite(LoadedTiles[TILE_TYPE_XOR].GraphicsDefinition->Sprite, 292, 91, TILE_ATTR(LoadedTiles[TILE_TYPE_XOR].GraphicsDefinition->Palette, FALSE, FALSE, FALSE));
+
+
 	ResetUI();
+}
+
+
+void CleanUpUI()
+{
+	SPR_releaseSprite(_upperUIElement);
+	SPR_releaseSprite(_middleUIElement);
+	SPR_releaseSprite(_lowerUIElement);
+
+	SPR_releaseSprite(_playerIcons[0]);
+	SPR_releaseSprite(_playerIcons[1]);
+
+	SPR_releaseSprite(_MaskIcon);
+}
+
+void SwitchPlayerUI(u8 playerId)
+{
+	u8 other = playerId == 0 ? 1 : 0;
+
+	SPR_setVisibility(_playerIcons[playerId], VISIBLE);
+	SPR_setVisibility(_playerIcons[other], HIDDEN);
 }
 
 
@@ -241,7 +284,7 @@ void ShowPausedUI()
 {
 	SPR_setFrame(_upperUIElement, 2);
 	SPR_setVisibility(_upperUIElement, VISIBLE);
-	SPR_setVisibility(_lowerUIElement, VISIBLE);
+	SPR_setVisibility(_lowerUIElement, VISIBLE);	
 }
 
 void HideUIElements()

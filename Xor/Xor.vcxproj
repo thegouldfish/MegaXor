@@ -85,9 +85,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="res\gfx.h" />
+    <ClInclude Include="res\SonicSet1.h" />
     <ClInclude Include="res\sound.h" />
     <ClInclude Include="res\sprite.h" />
-    <ClInclude Include="src\ActiveTrackers.h" />
+    <ClInclude Include="res\TileSet1.h" />
+    <ClInclude Include="res\YTSet1.h" />
     <ClInclude Include="src\BombH.h" />
     <ClInclude Include="src\BombV.h" />
     <ClInclude Include="src\ChickenLogic.h" />
@@ -95,19 +97,23 @@
     <ClInclude Include="src\DollLogic.h" />
     <ClInclude Include="src\Explosion.h" />
     <ClInclude Include="src\FishLogic.h" />
-    <ClInclude Include="src\ForceFields.h" />
     <ClInclude Include="src\GameMaps.h" />
     <ClInclude Include="src\Globals.h" />
     <ClInclude Include="src\Map.h" />
     <ClInclude Include="src\PadHelper.h" />
     <ClInclude Include="src\Players.h" />
+    <ClInclude Include="src\SaveGame.h" />
     <ClInclude Include="src\SimpleState.h" />
     <ClInclude Include="src\StateMapTest.h" />
-    <ClInclude Include="src\StateMoveTest.h" />
+    <ClInclude Include="src\StateOptionsMenu.h" />
     <ClInclude Include="src\StatePlayGame.h" />
     <ClInclude Include="src\StateSelectLevel.h" />
     <ClInclude Include="src\SwitchLogic.h" />
+    <ClInclude Include="src\TeleporterLogic.h" />
     <ClInclude Include="src\TileDefinitions.h" />
+    <ClInclude Include="src\TileLoading.h" />
+    <ClInclude Include="src\TileLoadTestState.h" />
+    <ClInclude Include="src\TileSets.h" />
     <ClInclude Include="src\UI.h" />
     <ClInclude Include="src\Xor.h" />
   </ItemGroup>
@@ -115,6 +121,7 @@
     <Resource Include="res\gfx.res">
       <FileType>Text</FileType>
     </Resource>
+    <Resource Include="res\SonicSet1.res" />
     <Resource Include="res\sound.res">
       <FileType>Text</FileType>
     </Resource>
@@ -123,7 +130,6 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ActiveTrackers.c" />
     <ClCompile Include="src\BombH.c" />
     <ClCompile Include="src\BombV.c" />
     <ClCompile Include="src\boot\rom_head.c" />
@@ -132,21 +138,30 @@
     <ClCompile Include="src\DollLogic.c" />
     <ClCompile Include="src\Explosion.c" />
     <ClCompile Include="src\FishLogic.c" />
-    <ClCompile Include="src\ForceFields.c" />
     <ClCompile Include="src\GameMaps.c" />
     <ClCompile Include="src\main.c" />
     <ClCompile Include="src\Map.c" />
     <ClCompile Include="src\PadHelper.c" />
     <ClCompile Include="src\Players.c" />
+    <ClCompile Include="src\SaveGame.c" />
     <ClCompile Include="src\SimpleState.c" />
     <ClCompile Include="src\StateMapTest.c" />
-    <ClCompile Include="src\StateMoveTest.c" />
+    <ClCompile Include="src\StateOptionsMenu.c" />
     <ClCompile Include="src\StatePlayGame.c" />
     <ClCompile Include="src\StateSelectLevel.c" />
     <ClCompile Include="src\SwitchLogic.c" />
-    <ClCompile Include="src\TileDefinitions.c" />
+    <ClCompile Include="src\TeleporterLogic.c" />
+    <ClCompile Include="src\TileLoading.c" />
+    <ClCompile Include="src\TileLoadTestState.c" />
+    <ClCompile Include="src\TileSets.c" />
     <ClCompile Include="src\UI.c" />
     <ClCompile Include="src\Xor.c" />
+    <Text Include="res\TileSet1.res">
+      <FileType>Document</FileType>
+    </Text>
+    <Resource Include="res\YTSet1.res">
+      <FileType>Document</FileType>
+    </Resource>
     <Resource Include="src\boot\sega.s">
       <FileType>Text</FileType>
     </Resource>

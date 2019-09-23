@@ -17,24 +17,21 @@
 #include "BombH.h"
 #include "BombV.h"
 #include "DollLogic.h"
-#include "ForceFields.h"
 #include "UI.h"
 #include "SwitchLogic.h"
 
 #include "StateSelectLevel.h"
+#include "TeleporterLogic.h"
 
+#include "TileLoading.h"
+
+#include "Xor.h"
 
 #define MOVED_NONE 0
 #define MOVED_VERTICALLY 1
 #define MOVED_HORIZONTALLY 2
 
 #define FADE_COLOUR(x)  (((VDPPALETTE_REDMASK & x) / 2) | ((VDPPALETTE_BLUEMASK & x) / 2) | ((VDPPALETTE_GREENMASK & x) / 2 ))
-
-
-
-static Sprite* _player;
-
-static Sprite* _playerUI;
 
 static char _recordedMovements[MAX_MOVE_COUNT];
 static u16 _currentMoveCount;
@@ -53,6 +50,20 @@ static u16 _fadedPallete[64];
 
 void StatePlayGame_Start()
 {
+
+	if (PlayerOptions.SelectedGraphics == 0)
+	{
+		SelectedGraphicsSet = &tileGraphicsSet1;
+	}
+	else if (PlayerOptions.SelectedGraphics == 1)
+	{
+		SelectedGraphicsSet = &tileGraphicsSonicSet1;
+	}
+	else if (PlayerOptions.SelectedGraphics == 2)
+	{
+		SelectedGraphicsSet = &tileGraphicsYouTubeSet1;
+	}
+
 	SYS_disableInts();
 	SPR_reset();
 	VDP_resetScreen();
@@ -90,7 +101,6 @@ void StatePlayGame_Start()
 	SetupUI();
 	
 	DollSetup();
-	SetupForceFields();
 	ExplosionSetup();
 	
 	VDP_waitVSync();
@@ -99,18 +109,16 @@ void StatePlayGame_Start()
 	PlayerState = PLAYER_STATE_WAITING;
 
 	ResetSwitches();
-	
-	_player = SPR_addSprite(&ShieldSprites, 0, 0, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
-	SPR_setFrame(_player, 0);
+
+	SetupTeleporters();	
 
 
-	_playerUI = SPR_addSprite(&ShieldSprites, 292, 196, TILE_ATTR(PAL2, FALSE, FALSE, FALSE));
-	SPR_setFrame(_playerUI, 0);
 
 
 	UpdatePlans();
-	SPR_setPosition(_player, CurrentPlayer->ScreenX, CurrentPlayer->ScreenY);
-
+	SPR_setVisibility(CurrentPlayer->Sprite, VISIBLE);
+	SPR_setPosition(CurrentPlayer->Sprite, CurrentPlayer->ScreenX, CurrentPlayer->ScreenY);
+	SwitchPlayerUI(CurrentPlayer->Id);
 
 	SPR_update();
 	_moveType = MOVED_NONE;
@@ -131,9 +139,9 @@ void StatePlayGame_Start()
 	
 
 	// Set colour zero to black as its nicer to see as a border colour
-	GameScreenPalette[0] = 0;
+	GamePalette[0] = 0;
 	
-	memcpy(_fadedPallete, GameScreenPalette, 64 * 2);
+	memcpy(_fadedPallete, GamePalette, 64 * 2);
 
 	
 	for (int i = 0; i < 48; i++)
@@ -143,7 +151,7 @@ void StatePlayGame_Start()
 	
 
 	KLog_U1("Free memory: ", MEM_getFree());
-	VDP_fadeIn(0, (4 * 16) - 1, GameScreenPalette, 10, FALSE);
+	VDP_fadeIn(0, (4 * 16) - 1, GamePalette, 10, FALSE);
 }
 
 
@@ -154,7 +162,7 @@ void ResetGame(bool startReplay)
 
 	LoadMap(SelectedLevel);
 	DollSetup();
-	SetupForceFields();
+	//SetupForceFields();
 	ExplosionSetup();
 
 	ResetSwitches();
@@ -174,10 +182,11 @@ void ResetGame(bool startReplay)
 	HideUIElements();
 	RedrawScreen(CurrentPlayer->ScreenMetaX, CurrentPlayer->ScreenMetaY);
 	UpdatePlans();
-	SPR_setPosition(_player, CurrentPlayer->ScreenX, CurrentPlayer->ScreenY);
-	
+	SPR_setPosition(CurrentPlayer->Sprite, CurrentPlayer->ScreenX, CurrentPlayer->ScreenY);
+	SPR_setVisibility(CurrentPlayer->Sprite, VISIBLE);
 
 
+	SetupTeleporters();
 
 
 	_moveType = MOVED_NONE;
@@ -195,7 +204,7 @@ void ResetGame(bool startReplay)
 	SPR_update();
 	VDP_waitVSync();
 	
-	VDP_fadeIn(0, (4 * 16) - 1, GameScreenPalette, 10, FALSE);
+	VDP_fadeIn(0, (4 * 16) - 1, GamePalette, 10, FALSE);
 }
 
 
@@ -236,7 +245,7 @@ void UpdatePauseScreen(bool canReturn)
 		if (Pad1.START == PAD_RELEASED)
 		{
 			HideUIElements();
-			VDP_fade(0, 63, _fadedPallete, GameScreenPalette, 10, FALSE);
+			VDP_fade(0, 63, _fadedPallete, GamePalette, 10, FALSE);
 			_paused = FALSE;
 		}
 	}
@@ -246,10 +255,12 @@ void UpdatePauseScreen(bool canReturn)
 
 void UpdateGameLogic()
 {
+	TickTiles();
+
 	if (Pad1.START == PAD_RELEASED)
 	{
 		ShowPausedUI();
-		VDP_fade(0, 63, GameScreenPalette , _fadedPallete, 20, TRUE);
+		VDP_fade(0, 63, GamePalette, _fadedPallete, 20, TRUE);
 		_paused = TRUE;
 		return;
 	}
@@ -263,9 +274,6 @@ void UpdateGameLogic()
 			memset(&_recordedMovements[_currentMoveCount], 0, MAX_MOVE_COUNT - _currentMoveCount);			
 		}
 	}
-
-	UpdateForceFieldH();
-	UpdateForceFieldV();
 
 	UpdateUI();
 
@@ -319,44 +327,57 @@ void UpdateGameLogic()
 				GameInteractionState = GAME_INTERACTION_STATE_NORMAL;
 			}
 
+
+			u8 moved = FALSE;
 			if (action == 'L')
 			{
-				PlayerMoveLeft();
-				_moveType = MOVED_HORIZONTALLY;
+				moved = PlayerMoveLeft();
+				_moveType = MOVED_VERTICALLY;
 			}
 			else if (action == 'R')
 			{
-				PlayerMoveRight();
-				_moveType = MOVED_HORIZONTALLY;
+				moved = PlayerMoveRight();
+				_moveType = MOVED_VERTICALLY;
 			}
 			else if (action == 'U')
 			{
-				PlayerMoveUp();
-				_moveType = MOVED_VERTICALLY;
+				moved = PlayerMoveUp();
+				_moveType = MOVED_HORIZONTALLY;
 			}
 			else if (action == 'D')
 			{
-				PlayerMoveDown();
-				_moveType = MOVED_VERTICALLY;
+				moved = PlayerMoveDown();
+				_moveType = MOVED_HORIZONTALLY;
 			}
 			else if (action == 'x')
 			{
-				VDP_fade(0, 47, GameScreenPalette, palette_black, 5, FALSE);
+				moved = TRUE;				
+				
+				if (PlayerChange())
+				{
+					VDP_fade(0, 47, GamePalette, palette_black, 5, FALSE);
+					PlayerUpdateMove(TRUE);
+					RedrawScreen(CurrentPlayer->ScreenMetaX, CurrentPlayer->ScreenMetaY);
+					SPR_setVisibility(CurrentPlayer->Sprite, VISIBLE);
+					SPR_setVisibility(OtherPlayer->Sprite, HIDDEN);
 
-				PlayerChange();
-				PlayerUpdateMove(TRUE);
-				RedrawScreen(CurrentPlayer->ScreenMetaX, CurrentPlayer->ScreenMetaY);
+					SwitchPlayerUI(CurrentPlayer->Id);
 
-				SPR_setFrame(_player, CurrentPlayer->SpriteFrame);
-				SPR_setFrame(_playerUI, CurrentPlayer->SpriteFrame);
+					SPR_setPosition(CurrentPlayer->Sprite, CurrentPlayer->ScreenX, CurrentPlayer->ScreenY);
 
-				SPR_setPosition(_player, CurrentPlayer->ScreenX, CurrentPlayer->ScreenY);
-
-				SPR_update();
-				VDP_waitVSync();
-				VDP_fadeIn(0, (3 * 16) - 1, GameScreenPalette, 5, FALSE);
-
+					SPR_update();
+					VDP_waitVSync();
+					VDP_fadeIn(0, (3 * 16) - 1, GamePalette, 5, FALSE);
+				}
 			}
+
+			if ((GameInteractionState == GAME_INTERACTION_STATE_USER_REPLAY || GameInteractionState == GAME_INTERACTION_STATE_TEST_REPLAY) && !moved)
+			{
+				KLog("failed to move");
+				KLog_U1("at location: ", _currentMoveCount-1);
+				GameInteractionState = GAME_INTERACTION_STATE_NORMAL;
+			}
+
 			break;
 		}
 
@@ -370,7 +391,7 @@ void UpdateGameLogic()
 			DollUpdateMovement();
 
 			UpdatePlans();
-			SPR_setPosition(_player, CurrentPlayer->ScreenX, CurrentPlayer->ScreenY);
+			SPR_setPosition(CurrentPlayer->Sprite, CurrentPlayer->ScreenX, CurrentPlayer->ScreenY);
 			break;
 		}
 
@@ -384,6 +405,8 @@ void UpdateGameLogic()
 			BombHFinishMovement();
 			DollFinishMovement();
 
+			FinishTeleport(CurrentPlayer->Sprite);
+
 			break;
 		}
 
@@ -395,24 +418,26 @@ void UpdateGameLogic()
 
 			if (_moveType == MOVED_VERTICALLY)
 			{
-				if (BombVUpdateLogic())
-				{
-					PlayerState = PLAYER_STATE_TILE_UPDATE;
-				}
-				else if (BombHUpdateLogic())
-				{
-					PlayerState = PLAYER_STATE_TILE_UPDATE;
-					_moveType = MOVED_NONE;
-				}
-				else if (ChickenUpdateLogic())
+
+				if (BombHUpdateLogic()) // down
 				{
 					PlayerState = PLAYER_STATE_TILE_UPDATE;
 					_moveType = MOVED_VERTICALLY;
 				}
 				else if (FishUpdateLogic())
 				{
-					_moveType = MOVED_NONE;
+					_moveType = MOVED_VERTICALLY;
 					PlayerState = PLAYER_STATE_TILE_UPDATE;
+				}
+				else if (BombVUpdateLogic())
+				{
+					PlayerState = PLAYER_STATE_TILE_UPDATE;
+					_moveType = MOVED_HORIZONTALLY;
+				}
+				else if (ChickenUpdateLogic()) //left
+				{
+					PlayerState = PLAYER_STATE_TILE_UPDATE;
+					_moveType = MOVED_HORIZONTALLY;					
 				}
 				else if (DollUpdateLogic())
 				{
@@ -433,21 +458,24 @@ void UpdateGameLogic()
 			}
 			else
 			{
-				if (BombHUpdateLogic())
-				{
-					PlayerState = PLAYER_STATE_TILE_UPDATE;
-				}
-				else if (BombVUpdateLogic())
-				{
-					PlayerState = PLAYER_STATE_TILE_UPDATE;
-					_moveType = MOVED_NONE;
-				}
-				else if (FishUpdateLogic())
+				
+				if (BombVUpdateLogic())
 				{
 					PlayerState = PLAYER_STATE_TILE_UPDATE;
 					_moveType = MOVED_HORIZONTALLY;
 				}
 				else if (ChickenUpdateLogic())
+				{
+					PlayerState = PLAYER_STATE_TILE_UPDATE;
+					_moveType = MOVED_HORIZONTALLY;
+				}
+				else if (BombHUpdateLogic())
+				{
+					PlayerState = PLAYER_STATE_TILE_UPDATE;
+					_moveType = MOVED_VERTICALLY;
+				}
+
+				else if (FishUpdateLogic())
 				{
 					PlayerState = PLAYER_STATE_TILE_UPDATE;
 					_moveType = MOVED_VERTICALLY;
@@ -514,7 +542,7 @@ void UpdateGameLogic()
 			{
 				_whoopsTimer = 120;
 				PlayerState = PLAYER_STATE_GAMEOVER;
-				SPR_setVisibility(_player, HIDDEN);
+				SPR_setVisibility(CurrentPlayer->Sprite, HIDDEN);
 				ShowGameOverUI();
 			}
 			else if ((CurrentPlayer->Alive == PLAYER_ALIVE_REPORT_NO || OtherPlayer->Alive == PLAYER_ALIVE_REPORT_NO) && !_playerDead)
@@ -523,7 +551,7 @@ void UpdateGameLogic()
 
 				if (CurrentPlayer->Alive == PLAYER_ALIVE_REPORT_NO)
 				{
-					SPR_setVisibility(_player, HIDDEN);
+					SPR_setVisibility(CurrentPlayer->Sprite, HIDDEN);
 				}
 
 				_playerDead = TRUE;
@@ -547,21 +575,23 @@ void UpdateGameLogic()
 				{
 					CurrentPlayer->Alive = PLAYER_ALIVE_NO;
 
-					VDP_fade(0, 47, GameScreenPalette, palette_black, 5, FALSE);
-					SPR_setVisibility(_player, VISIBLE);
+					VDP_fade(0, 47, GamePalette, palette_black, 5, FALSE);
+					
 
 					PlayerChange();
 					PlayerUpdateMove(TRUE);
 					RedrawScreen(CurrentPlayer->ScreenMetaX, CurrentPlayer->ScreenMetaY);
+					
+					SPR_setPosition(CurrentPlayer->Sprite, CurrentPlayer->ScreenX, CurrentPlayer->ScreenY);
 
-					SPR_setFrame(_player, CurrentPlayer->SpriteFrame);
-					SPR_setFrame(_playerUI, CurrentPlayer->SpriteFrame);
+					SPR_setVisibility(CurrentPlayer->Sprite, VISIBLE);
+					SPR_setVisibility(OtherPlayer->Sprite, HIDDEN);
 
-					SPR_setPosition(_player, CurrentPlayer->ScreenX, CurrentPlayer->ScreenY);
+					SwitchPlayerUI(CurrentPlayer->Id);
 
 					SPR_update();
 					VDP_waitVSync();
-					VDP_fadeIn(0, (3 * 16) - 1, GameScreenPalette, 5, FALSE);
+					VDP_fadeIn(0, (3 * 16) - 1, GamePalette, 5, FALSE);
 				}
 
 
@@ -580,6 +610,7 @@ void UpdateGameLogic()
 		case PLAYER_STATE_COMPLETE:
 		{
 			MapMoveCounts[SelectedLevel] = StepsTaken;
+			WriteSaveOut();
 			StateMachineChange(&GameMachineState, &StateLevelSelect);
 			break;
 		}
@@ -618,6 +649,8 @@ void StatePlayGame_End()
 {
 	VDP_fade(0, 63, _fadedPallete, palette_black, 20, FALSE);
 	
+	CleanUpUI();
+	SPR_update();
 	VDP_setPaletteColors(0, (u16*)palette_black, 64);
 	VDP_clearPlan(PLAN_WINDOW, TRUE);
 }

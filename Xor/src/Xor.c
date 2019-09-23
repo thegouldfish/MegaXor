@@ -9,5 +9,8 @@ u16 CameraYOffset;
 
 u8 GameInteractionState;
 
+u16 GamePalette[64];
 
-char* Version = "V0.4";
+Options PlayerOptions;
+
+char* Version = "V0.5";

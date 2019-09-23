@@ -1,0 +1,7 @@
+#include <genesis.h>
+#include "GameMaps.h"
+#include "Xor.h"
+
+
+u16 MapMoveCounts[MAP_COUNT];
+

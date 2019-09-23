@@ -9,7 +9,8 @@
 #include "BombV.h"
 #include "Explosion.h"
 #include "CommonLogic.h"
-#include "../res/sprite.h"
+
+#include "TileLoading.h"
 
 
 
@@ -24,9 +25,9 @@ static ActiveTileItem _chickenTile;
 
 void ChickenMakeSprite()
 {
-	_chickenTile.ActiveSprite = SPR_addSprite(&ShieldSprites, 0, 0, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
+	_chickenTile.ActiveSprite = SPR_addSprite(LoadedTiles[TILE_TYPE_CHICKEN].GraphicsDefinition->Sprite, 0, 0, TILE_ATTR(LoadedTiles[TILE_TYPE_CHICKEN].GraphicsDefinition->Palette, TRUE, FALSE, FALSE));
 	SPR_setVisibility(_chickenTile.ActiveSprite, HIDDEN);
-	SPR_setFrame(_chickenTile.ActiveSprite, 3);
+	SPR_setFrame(_chickenTile.ActiveSprite, 1);
 }
 
 void ChickenSetup()
@@ -229,15 +230,13 @@ void ChickenFinishMovement()
 
 void KillChicken(u16 x, u16 y)
 {
-	KLog("Killing chicken");
 	s8 id = FindId(x, y, _chickens, _chickenCount);
 	
-	KLog_S1("Chicken id is ", id);
 	if (id != -1)
 	{
-		_chickens[id].X = -1;
-		_chickens[id].Y = -1;
-		_chickens[id].Active = FALSE;
+		_chickens[(u8)id].X = -1;
+		_chickens[(u8)id].Y = -1;
+		_chickens[(u8)id].Active = FALSE;
 	}
 }
 

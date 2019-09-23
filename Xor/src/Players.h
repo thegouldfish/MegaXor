@@ -44,6 +44,7 @@ typedef struct
 
 	u8 Alive;
 
+	u8 CanTeleport;
 }Player;
 
 
@@ -63,12 +64,12 @@ extern s16 MapsCollected;
 
 void PlayersSetup();
 
-void PlayerMoveDown();
-void PlayerMoveUp();
-void PlayerMoveLeft();
-void PlayerMoveRight();
+u8 PlayerMoveDown();
+u8 PlayerMoveUp();
+u8 PlayerMoveLeft();
+u8 PlayerMoveRight();
 
-void PlayerChange();
+u8 PlayerChange();
 
 
 void PlayerStartMove();

@@ -11,6 +11,9 @@
 #include "BombV.h"
 #include "DollLogic.h"
 #include "SwitchLogic.h"
+#include "TeleporterLogic.h"
+#include "TileLoading.h"
+
 
 // externs
 u8 PlayerState = PLAYER_STATE_WAITING;
@@ -119,11 +122,21 @@ void PlayersSetup()
 	Players[0].TileId = TILE_TYPE_MAGNUS;
 	Players[0].SpriteFrame = 0;
 	Players[0].Alive = PLAYER_ALIVE_YES;
+	Players[0].CanTeleport = TRUE;
+	Players[0].Sprite = SPR_addSprite(LoadedTiles[TILE_TYPE_MAGNUS].GraphicsDefinition->Sprite, 0, 0, TILE_ATTR(LoadedTiles[TILE_TYPE_MAGNUS].GraphicsDefinition->Palette, FALSE, FALSE, FALSE));
+
+	SPR_setVisibility(Players[0].Sprite, HIDDEN);
+
+
 
 	Players[1].Id = 1;
 	Players[1].TileId = TILE_TYPE_QUESTOR;
 	Players[1].SpriteFrame = 1;
 	Players[1].Alive = PLAYER_ALIVE_YES;
+	Players[1].CanTeleport = TRUE;
+	Players[1].Sprite = SPR_addSprite(LoadedTiles[TILE_TYPE_QUESTOR].GraphicsDefinition->Sprite, 0, 0, TILE_ATTR(LoadedTiles[TILE_TYPE_MAGNUS].GraphicsDefinition->Palette, FALSE, FALSE, FALSE));
+
+	SPR_setVisibility(Players[1].Sprite, HIDDEN);
 
 	CurrentPlayer = &Players[0];
 	OtherPlayer = &Players[1];
@@ -303,6 +316,11 @@ void PlayerEndMove()
 			PlayerState = PLAYER_STATE_TILE_LOGIC;
 			break;
 
+		case TILE_TYPE_TELEPORTER:
+			TeleportCurrentPlayer();
+			PlayerState = PLAYER_STATE_TILE_LOGIC;
+			break;
+
 		default:
 			PlayerState = PLAYER_STATE_TILE_LOGIC;
 			break;
@@ -310,11 +328,13 @@ void PlayerEndMove()
 }
 
 
-void PlayerMoveDown()
+u8 PlayerMoveDown()
 {
 	u16 y = CurrentPlayer->MetaY + 1;
 	u8 tile = CurrentMapDataState[MAP_XY_TO_TILE(CurrentPlayer->MetaX, y)];
 	u8 canMove = FALSE;
+
+	CurrentPlayer->CanTeleport = TRUE;
 
 	switch (tile)
 	{
@@ -323,6 +343,7 @@ void PlayerMoveDown()
 		case TILE_TYPE_MAP:
 		case TILE_TYPE_XOR:
 		case TILE_TYPE_SWITCH:
+		case TILE_TYPE_TELEPORTER:
 			canMove = TRUE;
 			break;
 
@@ -362,14 +383,18 @@ void PlayerMoveDown()
 		_xMoveLeft = 0;
 		PlayerStartMove();
 	}
+
+	return canMove;
 }
 
 
-void PlayerMoveUp()
+u8 PlayerMoveUp()
 {
 	u16 y = CurrentPlayer->MetaY - 1;
 	u8 tile = CurrentMapDataState[MAP_XY_TO_TILE(CurrentPlayer->MetaX, y)];
 	u8 canMove = FALSE;
+
+	CurrentPlayer->CanTeleport = TRUE;
 
 	switch (tile)
 	{
@@ -378,6 +403,7 @@ void PlayerMoveUp()
 		case TILE_TYPE_MAP:
 		case TILE_TYPE_XOR:		
 		case TILE_TYPE_SWITCH:
+		case TILE_TYPE_TELEPORTER:
 			canMove = TRUE;
 			break;
 
@@ -419,14 +445,18 @@ void PlayerMoveUp()
 		CurrentPlayer->MetaY = y;
 		PlayerStartMove();
 	}
+
+	return canMove;
 }
 
 
-void PlayerMoveLeft()
+u8 PlayerMoveLeft()
 {
 	u16 x = CurrentPlayer->MetaX - 1;
 	u8 tile = CurrentMapDataState[MAP_XY_TO_TILE(x, CurrentPlayer->MetaY)];
 	u8 canMove = FALSE;
+
+	CurrentPlayer->CanTeleport = TRUE;
 
 	switch (tile)
 	{
@@ -435,6 +465,7 @@ void PlayerMoveLeft()
 		case TILE_TYPE_MAP:
 		case TILE_TYPE_XOR:
 		case TILE_TYPE_SWITCH:
+		case TILE_TYPE_TELEPORTER:
 			canMove = TRUE;
 			break;
 
@@ -474,14 +505,18 @@ void PlayerMoveLeft()
 		CurrentPlayer->MetaX = x;
 		PlayerStartMove();
 	}
+
+	return canMove;
 }
 
 
-void PlayerMoveRight()
+u8 PlayerMoveRight()
 {
 	u16 x = CurrentPlayer->MetaX + 1;
 	u8 tile = CurrentMapDataState[MAP_XY_TO_TILE(x, CurrentPlayer->MetaY)];
 	u8 canMove = FALSE;
+
+	CurrentPlayer->CanTeleport = TRUE;
 
 	switch (tile)
 	{
@@ -490,6 +525,7 @@ void PlayerMoveRight()
 		case TILE_TYPE_MAP:
 		case TILE_TYPE_XOR:	
 		case TILE_TYPE_SWITCH:
+		case TILE_TYPE_TELEPORTER:
 			canMove = TRUE;
 			break;
 
@@ -529,17 +565,19 @@ void PlayerMoveRight()
 		CurrentPlayer->MetaX = x;
 		PlayerStartMove();
 	}
+
+	return canMove;
 }
 
 
-void PlayerChange()
+u8 PlayerChange()
 {
-	StepsTaken++;
 	u8 nextId = (CurrentPlayer->Id == 0) ? 1 : 0;
 
-	if (Players[nextId].Alive)
+	if (Players[nextId].Alive == PLAYER_ALIVE_YES)
 	{
-		if (CurrentPlayer->Alive)
+		StepsTaken++;
+		if (CurrentPlayer->Alive == PLAYER_ALIVE_YES)
 		{
 			CurrentMapDataState[MAP_XY_TO_TILE(CurrentPlayer->MetaX, CurrentPlayer->MetaY)] = CurrentPlayer->TileId;
 		}
@@ -550,15 +588,26 @@ void PlayerChange()
 
 		OtherPlayer = CurrentPlayer;
 		CurrentPlayer = &Players[nextId];
-		CurrentMapDataState[MAP_XY_TO_TILE(CurrentPlayer->MetaX, CurrentPlayer->MetaY)] = TILE_TYPE_FLOOR;
+		if (CurrentPlayer->CanTeleport)
+		{
+			CurrentMapDataState[MAP_XY_TO_TILE(CurrentPlayer->MetaX, CurrentPlayer->MetaY)] = TILE_TYPE_FLOOR;
+		}
+		else
+		{
+			CurrentMapDataState[MAP_XY_TO_TILE(CurrentPlayer->MetaX, CurrentPlayer->MetaY)] = TILE_TYPE_TELEPORTER;
+		}
+
+		return TRUE;
 	}
 	else
 	{
-		if (!CurrentPlayer->Alive)
+		if (CurrentPlayer->Alive != PLAYER_ALIVE_YES)
 		{
 			PlayerState = PLAYER_STATE_GAMEOVER;
 		}
 	}
+
+	return FALSE;
 }
 
 

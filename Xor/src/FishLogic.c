@@ -11,7 +11,7 @@
 #include "Explosion.h"
 #include "CommonLogic.h"
 
-#include "../res/sprite.h"
+#include "TileLoading.h"
 
 static ActiveTileItem _fishTile;
 
@@ -22,9 +22,9 @@ static u8 _fishCount;
 
 void FishMakeSprite()
 {
-	_fishTile.ActiveSprite = SPR_addSprite(&ShieldSprites, 0, 0, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
+	_fishTile.ActiveSprite = SPR_addSprite(LoadedTiles[TILE_TYPE_FISH].GraphicsDefinition->Sprite, 0, 0, TILE_ATTR(LoadedTiles[TILE_TYPE_FISH].GraphicsDefinition->Palette, TRUE, FALSE, FALSE));
 	SPR_setVisibility(_fishTile.ActiveSprite, HIDDEN);
-	SPR_setFrame(_fishTile.ActiveSprite, 2);
+	SPR_setFrame(_fishTile.ActiveSprite, 0);
 }
 
 void FishSetup()
@@ -232,15 +232,13 @@ void FishFinishMovement()
 
 void KillFish(u16 x, u16 y)
 {
-	KLog_U2("Killing a fish at : ", x, " , ", y);
 	s8 id = FindId(x, y, _fishes, _fishCount);
 	
-	KLog_S1("fish id ", id);
 	if (id != -1)
 	{
-		_fishes[id].X = -1;
-		_fishes[id].Y = -1;
-		_fishes[id].Active = FALSE;
+		_fishes[(u8)id].X = -1;
+		_fishes[(u8)id].Y = -1;
+		_fishes[(u8)id].Active = FALSE;
 	}
 	else
 	{

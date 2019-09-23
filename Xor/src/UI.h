@@ -10,6 +10,8 @@ void UpdateUI();
 void ExplosionHappenedUI();
 
 
+void SwitchPlayerUI(u8 playerId);
+
 
 void ShowWhoopsUI();
 
@@ -18,5 +20,8 @@ void ShowGameOverUI();
 void ShowPausedUI();
 
 void HideUIElements();
+
+
+void CleanUpUI();
 
 #endif

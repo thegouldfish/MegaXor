@@ -2,6 +2,8 @@
 #include "StateSelectLevel.h"
 #include "../res/gfx.h"
 
+#include "StateOptionsMenu.h"
+
 #include "StatePlayGame.h"
 
 #include "PadHelper.h"
@@ -22,7 +24,7 @@ static s16 _currentPaletteAnimationFrame = 0;
 static u8 _paletteAnimatingUp = TRUE;
 
 
-void SetBackingHighlight()
+static void SetBackingHighlight()
 {
 	for (u8 i = 0; i < 28; i++)
 	{
@@ -32,7 +34,7 @@ void SetBackingHighlight()
 }
 
 
-void SetNumberCharsEx(u32 number, char* buff, int size, char defaultChar)
+static void SetNumberCharsEx(u32 number, char* buff, int size, char defaultChar)
 {
 	for (int i = 0; i < size - 1; i++)
 	{
@@ -109,7 +111,8 @@ void StateLevelSelect_Start()
 	SetBackingHighlight();
 
 
-	VDP_drawText(Version, 32, 26);
+	VDP_drawText("(A) Select : (B) Options", 7, 26);
+	VDP_drawText(Version, 32, 27);
 
 	SYS_enableInts();
 
@@ -162,6 +165,10 @@ void StateLevelSelect_Update()
 		SelectedLevel = _currentSelection;
 		StateMachineChange(&GameMachineState, &StatePlayGame);
 	}	
+	else if (Pad1.B == PAD_RELEASED)
+	{
+		StateMachineChange(&GameMachineState, &StateOptionsMenu);
+	}
 }
 
 

@@ -16,8 +16,6 @@ typedef struct
 const extern MapDefinition* CurrentMap;
 extern u8 CurrentMapDataState[MAP_SIZE];
 
-extern u16 GameScreenPalette[64];
-
 extern u16 VramTileIndex;
 
 extern u8 TileIndexOffset;

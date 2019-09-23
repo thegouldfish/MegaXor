@@ -3,7 +3,7 @@
 
 #include <genesis.h>
 
-#define TILECOUNT 16
+#define TILECOUNT 18
 
 // All the various Tile Types and the id that will be provided by the map conversion tool
 
@@ -32,29 +32,6 @@
 
 #define TILE_TYPE_TELEPORTER 16
 
-
-// The plan the tile should be shown on
-#define TILE_PLAN_A 0
-#define TILE_PLAN_B 1
-#define TILE_PLAN_S 2
-
-
-// Each tile type requires details on what to draw, the priority and the set and animation.
-typedef struct
-{
-	u8 TiledNumber;
-	
-	u8 TileSet;
-	s8 TileId;
-	u8 AnimationCount;
-	u8 Plan;
-
-	u8 Priority;
-} TileDefinition;
-
-
-
-
-const extern TileDefinition* Tiles[TILECOUNT];
+#define TILE_TYPE_EMPTY 17
 
 #endif

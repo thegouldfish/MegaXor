@@ -2,14 +2,15 @@
 #include "BombH.h"
 #include "Map.h"
 #include "GameMaps.h"
-#include "TileDefinitions.h"
 #include "Xor.h"
 #include "Players.h"
 #include "Explosion.h"
 #include "BombV.h"
 #include "CommonLogic.h"
+#include "TileDefinitions.h"
 
 #include "../res/sprite.h"
+#include "TileLoading.h"
 
 static ActiveTileItem _bombHsTile;
 
@@ -20,9 +21,9 @@ static u8 _bombHsCount;
 
 void BombHMakeSprite()
 {
-	_bombHsTile.ActiveSprite = SPR_addSprite(&sp_set2, 0, 0, TILE_ATTR(PAL1, TRUE, FALSE, FALSE));
+	_bombHsTile.ActiveSprite = SPR_addSprite(LoadedTiles[TILE_TYPE_BOMB_H].GraphicsDefinition->Sprite, 0, 0, TILE_ATTR(PAL1, TRUE, FALSE, FALSE));
 	SPR_setVisibility(_bombHsTile.ActiveSprite, HIDDEN);
-	SPR_setFrame(_bombHsTile.ActiveSprite, 0);
+	SPR_setFrame(_bombHsTile.ActiveSprite, 2);
 }
 
 void BombHSetup()

@@ -9,17 +9,11 @@
 #include "ChickenLogic.h"
 #include "FishLogic.h"
 
-#include "../res/gfx.h"
+#include "TileLoading.h"
 
 
 #define MAX_EXPLOSIONS 10
 static Point _explosions[MAX_EXPLOSIONS];
-
-static s16 _explosionTimer = 0;
-static s16 _explosionFrameCount = 6;
-
-static s16 _explosionAnimationCount = 5;
-static s16 _explosionCurrentFrame = 0;
 
 static s16 _explosionCount = 0;
 
@@ -49,45 +43,30 @@ u8 ExplosionUpdate()
 	}
 	else
 	{
-		_explosionTimer--;
-
-		if (_explosionTimer == 0)
-		{
-			_explosionTimer = _explosionFrameCount;
-			_explosionCurrentFrame++;
-
-			if (_explosionCurrentFrame == _explosionAnimationCount)
-			{				
-				for (int i = 0; i < MAX_EXPLOSIONS; i++)
+		if (LoadedTiles[TILE_TYPE_EXPLOSION].CurrentAnimationFrame == LoadedTiles[TILE_TYPE_EXPLOSION].GraphicsDefinition->AnimationCount - 1)
+		{			
+			for (int i = 0; i < MAX_EXPLOSIONS; i++)
+			{
+				if (_explosions[i].X != -1)
 				{
-					if (_explosions[i].X != -1)
+					if (OnScreen(_explosions[i].X, _explosions[i].Y))
 					{
 						UpdateTile(_explosions[i].X, _explosions[i].Y, TILE_TYPE_FLOOR);
-
-						_explosions[i].X = -1;
-						_explosions[i].Y = -1;
 					}
+					else
+					{
+						CurrentMapDataState[MAP_XY_TO_TILE(_explosions[i].X, _explosions[i].Y)] = TILE_TYPE_FLOOR;
+					}						
+					_explosions[i].X = -1;
+					_explosions[i].Y = -1;
 				}
+			}
 
 				
-				ExplosionHappenedUI();
-				_explosionCount = 0;
-				_explotionsTriggered = FALSE;
-				return TRUE;
-			}
-			else
-			{				
-				u16 index = TILE_USERINDEX + 15;
-				u32* tilePtr = tile_explosion.tileset->tiles;
-				tilePtr += (_explosionCurrentFrame * 24);
-				
-				for (int i = 0; i < 3; i++)
-				{
-					VDP_loadTileData(tilePtr, index, 3, CPU);
-					index += TileIndexOffset;
-					tilePtr += 120;
-				}
-			}
+			ExplosionHappenedUI();
+			_explosionCount = 0;
+			_explotionsTriggered = FALSE;
+			return TRUE;
 		}
 
 		return FALSE;
@@ -102,8 +81,9 @@ void TriggerExplosions()
 {
 	if (_explosionCount != 0)
 	{
-		_explosionTimer = _explosionFrameCount;
-		_explosionCurrentFrame = 0;
+		LoadedTiles[TILE_TYPE_EXPLOSION].CurrentAnimationFrame = 0;
+		LoadedTiles[TILE_TYPE_EXPLOSION].FrameTimer = 0;
+
 		_explotionsTriggered = TRUE;
 
 		KLog("Trigger booms");
@@ -138,7 +118,10 @@ void TriggerExplosions()
 					KillFish(x, y);
 				}
 
-				UpdateTile(x, y, TILE_TYPE_EXPLOSION);
+				if (OnScreen(x, y))
+				{
+					UpdateTile(x, y, TILE_TYPE_EXPLOSION);
+				}
 			}
 		}
 	}

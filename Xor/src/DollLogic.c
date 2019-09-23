@@ -5,7 +5,8 @@
 #include "TileDefinitions.h"
 #include "CommonLogic.h"
 
-#include "../res/sprite.h"
+#include "TileDefinitions.h"
+#include "TileLoading.h"
 
 static ActiveTileItem _dollTile;
 
@@ -17,9 +18,9 @@ static ActiveTileItem _dollTile;
 
 void DollSetup()
 {
-	_dollTile.ActiveSprite = SPR_addSprite(&sp_set2, 0, 0, TILE_ATTR(PAL1, TRUE, FALSE, FALSE));
+	_dollTile.ActiveSprite = SPR_addSprite(LoadedTiles[TILE_TYPE_DOLL].GraphicsDefinition->Sprite, 0, 0, TILE_ATTR(PAL1, TRUE, FALSE, FALSE));
 	SPR_setVisibility(_dollTile.ActiveSprite, HIDDEN);
-	SPR_setFrame(_dollTile.ActiveSprite, 2);
+	SPR_setFrame(_dollTile.ActiveSprite, 4);
 	_dollTile.IsActive = FALSE;
 }
 
