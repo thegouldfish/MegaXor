@@ -39,6 +39,13 @@ Collect all the tiles that look like the mask on the side then find the exit doo
 
 ## Version History ##
 
+### V0.4 ###
+* Implement Switch tile type
+* Fix ordering of chicken's and fish dependent on what moved last
+* Level 8 added
+* Level 9 added
+* Fixed chicken and fish not correctly being killed
+
 ### V0.3 ###
 * Level 5 added
 * Level 6 added
