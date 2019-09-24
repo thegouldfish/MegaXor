@@ -105,7 +105,11 @@ void RedrawScreen(u8 startX, u8 startY)
 			
 
 			u16 mapDataIndex = MULTIPLY_BY_32(tileY) + tileX;
-			u8 tileId = CurrentMapDataState[mapDataIndex];
+			u8 tileId = TILE_TYPE_EMPTY;
+			if (mapDataIndex >= 0 && mapDataIndex < 1024)
+			{
+				tileId = CurrentMapDataState[mapDataIndex];
+			}
 
 
 			u8 tileIdA = 0;
@@ -174,7 +178,12 @@ void DrawColumn(u16 startX, u16 startY)
 		u16 tileY = y + startY;
 
 		u16 mapDataIndex = MULTIPLY_BY_32(tileY) + startX;
-		u8 tileId = CurrentMapDataState[mapDataIndex];
+		
+		u8 tileId = TILE_TYPE_EMPTY;
+		if (mapDataIndex >= 0 && mapDataIndex < 1024)
+		{
+			tileId = CurrentMapDataState[mapDataIndex];
+		}
 
 		u8 tileIdA = 0;
 		u8 tileIdB = 0;
@@ -227,7 +236,12 @@ void DrawRow(u16 startX, u16 startY)
 		u16 tilex = x + startX;
 
 		u16 mapDataIndex = tileYoffest + tilex;
-		u8 tileId = CurrentMapDataState[mapDataIndex];
+
+		u8 tileId = TILE_TYPE_EMPTY;
+		if (mapDataIndex >= 0 && mapDataIndex < 1024)
+		{
+			tileId = CurrentMapDataState[mapDataIndex];
+		}
 
 		u8 tileIdA = 0;
 		u8 tileIdB = 0;
@@ -242,14 +256,13 @@ void DrawRow(u16 startX, u16 startY)
 			tileIdB = TILE_TYPE_FLOOR;
 		}
 
-
 		for (u8 i = 0; i < 3; i++)
 		{
 			for (u8 j = 0; j < 3; j++)
 			{
 				u8 loc = (planx + j) & PLAN_HEIGHT_MODUS;
 
-				_screenRowA[i][loc] = LoadedTiles[tileIdA].TileAttribs[j][i]; 
+				_screenRowA[i][loc] = LoadedTiles[tileIdA].TileAttribs[j][i];
 				_screenRowB[i][loc] = LoadedTiles[tileIdB].TileAttribs[j][i];
 			}
 		}
@@ -269,38 +282,58 @@ void DrawRow(u16 startX, u16 startY)
 
 void UpdatePlans()
 {
-	s16 camMetaTileX1 = _camX / 24;
-	s16 camMetaTileY1 = _camY / 24;
+	s16 camMetaTileX = _camX / 24;
+	s16 camMetaTileY = _camY / 24;
 
-	if (camMetaTileX1 > _metaTileXStart && camMetaTileX1 < 32)
+	if (camMetaTileX > 31)
+	{
+		camMetaTileX = 31;
+	}
+	else if (camMetaTileX < 0)
+	{
+		camMetaTileX = 0;
+	}
+	if (camMetaTileY > 31)
+	{
+		camMetaTileY = 31;
+	}
+	else if (camMetaTileY < 0)
+	{
+		camMetaTileY = 0;
+	}
+
+
+
+	if (camMetaTileX > _metaTileXStart && camMetaTileX < 32)
 	{
 		// Update Right hand column
-		DrawColumn(camMetaTileX1+14, camMetaTileY1);
+		DrawColumn(camMetaTileX+14, camMetaTileY);
 
 		_metaTileXStart++;
 		_planTileXStart += 3;
 	}
-	if (camMetaTileX1 < _metaTileXStart && camMetaTileX1 > -1)
+	if (camMetaTileX < _metaTileXStart && camMetaTileX > -1)
 	{
 		// Update Left hand column
-		DrawColumn(camMetaTileX1, camMetaTileY1);
+		DrawColumn(camMetaTileX, camMetaTileY);
 
 		_metaTileXStart--;
 		_planTileXStart -= 3;
 	}
 
 
-	if (camMetaTileY1 > _metaTileYStart && camMetaTileY1 < 32)
+	if (camMetaTileY > _metaTileYStart && camMetaTileY < 32)
 	{
 		// Update Bottom row
-		DrawRow(camMetaTileX1, camMetaTileY1 + 10);
+
+		DrawRow(camMetaTileX, camMetaTileY + 10);
 		_metaTileYStart++;
 		_planTileYStart += 3;
 	}
-	if (camMetaTileY1 < _metaTileYStart)
+	if (camMetaTileY  < _metaTileYStart)
 	{
 		// udate Top row
-		DrawRow(camMetaTileX1, camMetaTileY1);
+		DrawRow(camMetaTileX, camMetaTileY);
 		_metaTileYStart--;
 		_planTileYStart -= 3;
 	}
@@ -319,7 +352,7 @@ void SetTile(u16 tileX, u16 tileY, u16 planX, u16 planY)
 	if (LoadedTiles[tileId].GraphicsDefinition->Plan == CONST_PLAN_B)
 	{
 		// set planA to transparent
-		memset(_TileBufferA, 0, 18);
+		memcpy(_TileBufferA, LoadedTiles[TILE_TYPE_EMPTY].TileAttribs, 18);
 
 		//copy the tile attributes to the buffer
 		memcpy(_TileBufferB, LoadedTiles[tileId].TileAttribs, 18);
@@ -337,12 +370,17 @@ void SetTile(u16 tileX, u16 tileY, u16 planX, u16 planY)
 	{	
 		for (int yy = 0; yy < 3; yy++)
 		{
-			VDP_setTileMapXY(PLAN_A, _TileBufferA[f], planX + xx, planY + yy);
-			VDP_setTileMapXY(PLAN_B, _TileBufferB[f], planX + xx, planY + yy);
+			u16 x = (planX + xx) & 63;
+			u16 y = (planY + yy) & 63;
+
+			VDP_setTileMapXY(PLAN_A, _TileBufferA[f], x, y);
+			VDP_setTileMapXY(PLAN_B, _TileBufferB[f], x, y);
 			f++;
 		}
 	}
 }
+
+
 
 void UpdateTile(u16 metaX, u16 metaY,  u16 tileId)
 {
@@ -354,9 +392,9 @@ void UpdateTile(u16 metaX, u16 metaY,  u16 tileId)
 	s16 planX = ((offSetX) * 3) + _planTileXStart;
 	s16 planY = ((offSetY) * 3) + _planTileYStart;
 
-
-	SetTile(metaX, metaY, planX, planY);
+	SetTile(metaX, metaY, planX, planY);	
 }
+
 
 u8 OnScreen(u16 metaX, u16 metaY)
 {

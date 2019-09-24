@@ -27,6 +27,8 @@
 
 #include "Xor.h"
 
+#include "SaveGame.h"
+
 #define MOVED_NONE 0
 #define MOVED_VERTICALLY 1
 #define MOVED_HORIZONTALLY 2
@@ -64,6 +66,7 @@ void StatePlayGame_Start()
 		SelectedGraphicsSet = &tileGraphicsYouTubeSet1;
 	}
 
+	
 	SYS_disableInts();
 	SPR_reset();
 	VDP_resetScreen();
@@ -75,7 +78,7 @@ void StatePlayGame_Start()
 	InitTileSets();	
 	
 
-
+	
 
 	_currentMoveCount = 0;
 
@@ -85,6 +88,9 @@ void StatePlayGame_Start()
 	LoadMap(SelectedLevel);
 	
 	PlayersSetup();	
+	PlayersSetSprite();
+
+	
 
 	FishMakeSprite();
 	FishSetup();
@@ -92,17 +98,23 @@ void StatePlayGame_Start()
 	ChickenMakeSprite();
 	ChickenSetup();
 
+	
+
 	BombHMakeSprite();
 	BombHSetup();
 
+	
+
 	BombVMakeSprite();
-	BombVSetup();
+	BombVSetup();	
 
 	SetupUI();
 	
 	DollSetup();
 	ExplosionSetup();
 	
+	
+
 	VDP_waitVSync();
 	RedrawScreen(CurrentPlayer->ScreenMetaX , CurrentPlayer->ScreenMetaY);
 	
@@ -177,6 +189,7 @@ void ResetGame(bool startReplay)
 	
 
 	PlayersSetup();
+	PlayersReset();
 
 	ResetUI();
 	HideUIElements();
@@ -650,7 +663,10 @@ void StatePlayGame_End()
 	VDP_fade(0, 63, _fadedPallete, palette_black, 20, FALSE);
 	
 	CleanUpUI();
+
+	SPR_reset();	
 	SPR_update();
+
 	VDP_setPaletteColors(0, (u16*)palette_black, 64);
 	VDP_clearPlan(PLAN_WINDOW, TRUE);
 }

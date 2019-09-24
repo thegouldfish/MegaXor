@@ -33,11 +33,11 @@ const struct
     0x00100000,
     0x00FF0000,
     0x00FFFFFF,
-    "  ",
+    "RA",
     0x0000,
     0x00200000,
     0x002001FF,
     "            ",
-    "DEMONSTRATION PROGRAM                   ",
+	"XOR!                                   ",
     "JUE             "
 };

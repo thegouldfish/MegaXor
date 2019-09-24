@@ -55,3 +55,5 @@ Done
 * Added option to clear save
 * Fixed up teleport to handle blocked squares correctly
 * fixed broken player death
+* fixed issue with going off the map when drawing near the bottom right hand corner.
+* fixed bug with sprites showing up multiple times.

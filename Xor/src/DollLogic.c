@@ -20,7 +20,6 @@ void DollSetup()
 {
 	_dollTile.ActiveSprite = SPR_addSprite(LoadedTiles[TILE_TYPE_DOLL].GraphicsDefinition->Sprite, 0, 0, TILE_ATTR(PAL1, TRUE, FALSE, FALSE));
 	SPR_setVisibility(_dollTile.ActiveSprite, HIDDEN);
-	SPR_setFrame(_dollTile.ActiveSprite, 4);
 	_dollTile.IsActive = FALSE;
 }
 

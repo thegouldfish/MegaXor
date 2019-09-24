@@ -12,6 +12,8 @@ void SaveInit()
 
 void WriteSaveOut()
 {
+	KLog("Saving");
+
 	SRAM_writeByte(0, SAVE_MAGIC_NUMBER);
 	SRAM_writeByte(1, SAVE_VERSION);
 	u16 currentByte = 2;
@@ -25,6 +27,7 @@ void WriteSaveOut()
 	SRAM_writeByte(currentByte, PlayerOptions.SelectedGraphics);
 	currentByte++;
 
+	KLog_U1("Done ended at: ", currentByte);
 }
 
 

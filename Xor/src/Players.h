@@ -63,6 +63,8 @@ extern s16 MapsCollected;
 
 
 void PlayersSetup();
+void PlayersSetSprite();
+void PlayersReset();
 
 u8 PlayerMoveDown();
 u8 PlayerMoveUp();

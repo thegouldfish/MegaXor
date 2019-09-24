@@ -70,6 +70,7 @@ int main()
 
 	SetupPad(&Pad1, JOY_1);		
 
+	SaveInit();
 	if (!ReadSaveIn())
 	{
 		for (int i = 0; i < MAP_COUNT; i++)

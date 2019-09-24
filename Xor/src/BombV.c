@@ -26,7 +26,6 @@ void BombVMakeSprite()
 {
 	_bombVTile.ActiveSprite = SPR_addSprite(LoadedTiles[TILE_TYPE_BOMB_V].GraphicsDefinition->Sprite, 0, 0, TILE_ATTR(PAL1, TRUE, FALSE, FALSE));
 	SPR_setVisibility(_bombVTile.ActiveSprite, HIDDEN);
-	SPR_setFrame(_bombVTile.ActiveSprite, 3);
 }
 
 void BombVSetup()

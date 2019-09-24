@@ -24,7 +24,6 @@ void FishMakeSprite()
 {
 	_fishTile.ActiveSprite = SPR_addSprite(LoadedTiles[TILE_TYPE_FISH].GraphicsDefinition->Sprite, 0, 0, TILE_ATTR(LoadedTiles[TILE_TYPE_FISH].GraphicsDefinition->Palette, TRUE, FALSE, FALSE));
 	SPR_setVisibility(_fishTile.ActiveSprite, HIDDEN);
-	SPR_setFrame(_fishTile.ActiveSprite, 0);
 }
 
 void FishSetup()

@@ -123,9 +123,10 @@ void PlayersSetup()
 	Players[0].SpriteFrame = 0;
 	Players[0].Alive = PLAYER_ALIVE_YES;
 	Players[0].CanTeleport = TRUE;
-	Players[0].Sprite = SPR_addSprite(LoadedTiles[TILE_TYPE_MAGNUS].GraphicsDefinition->Sprite, 0, 0, TILE_ATTR(LoadedTiles[TILE_TYPE_MAGNUS].GraphicsDefinition->Palette, FALSE, FALSE, FALSE));
 
-	SPR_setVisibility(Players[0].Sprite, HIDDEN);
+	
+
+	
 
 
 
@@ -134,9 +135,8 @@ void PlayersSetup()
 	Players[1].SpriteFrame = 1;
 	Players[1].Alive = PLAYER_ALIVE_YES;
 	Players[1].CanTeleport = TRUE;
-	Players[1].Sprite = SPR_addSprite(LoadedTiles[TILE_TYPE_QUESTOR].GraphicsDefinition->Sprite, 0, 0, TILE_ATTR(LoadedTiles[TILE_TYPE_MAGNUS].GraphicsDefinition->Palette, FALSE, FALSE, FALSE));
 
-	SPR_setVisibility(Players[1].Sprite, HIDDEN);
+	
 
 	CurrentPlayer = &Players[0];
 	OtherPlayer = &Players[1];
@@ -150,6 +150,20 @@ void PlayersSetup()
 	PlayerState = PLAYER_STATE_WAITING;
 }
 
+void PlayersSetSprite()
+{
+	Players[0].Sprite = SPR_addSprite(LoadedTiles[TILE_TYPE_MAGNUS].GraphicsDefinition->Sprite, 0, 0, TILE_ATTR(LoadedTiles[TILE_TYPE_MAGNUS].GraphicsDefinition->Palette, FALSE, FALSE, FALSE));
+	Players[1].Sprite = SPR_addSprite(LoadedTiles[TILE_TYPE_QUESTOR].GraphicsDefinition->Sprite, 0, 0, TILE_ATTR(LoadedTiles[TILE_TYPE_MAGNUS].GraphicsDefinition->Palette, FALSE, FALSE, FALSE));
+
+	PlayersReset();
+}
+
+
+void PlayersReset()
+{
+	SPR_setVisibility(Players[0].Sprite, HIDDEN);
+	SPR_setVisibility(Players[1].Sprite, HIDDEN);
+}
 
 
 void PlayerStartMove()

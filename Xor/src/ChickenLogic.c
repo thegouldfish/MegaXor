@@ -27,7 +27,6 @@ void ChickenMakeSprite()
 {
 	_chickenTile.ActiveSprite = SPR_addSprite(LoadedTiles[TILE_TYPE_CHICKEN].GraphicsDefinition->Sprite, 0, 0, TILE_ATTR(LoadedTiles[TILE_TYPE_CHICKEN].GraphicsDefinition->Palette, TRUE, FALSE, FALSE));
 	SPR_setVisibility(_chickenTile.ActiveSprite, HIDDEN);
-	SPR_setFrame(_chickenTile.ActiveSprite, 1);
 }
 
 void ChickenSetup()
