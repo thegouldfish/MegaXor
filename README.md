@@ -39,12 +39,32 @@ Collect all the tiles that look like the mask on the side then find the exit doo
 
 ## Version History ##
 
+### V0.5 ###
+* Added Teleporter
+* Added all the rest of the levels.
+* Further fixes to the order that fish, chicken and bombs move
+* Fixed off screen explositions showing on screen
+* Correctly kill other objects when exploded
+* Refactored graphics loading code
+* better handling of animated tiles
+* Added Options Menu
+* Added Sonic tile set
+* Added YouTuber tile set
+* Added Settings, score saving and loading
+* Added option to clear save
+* Fixed up teleport to handle blocked squares correctly
+* fixed broken player death
+* fixed issue with going off the map when drawing near the bottom right hand corner.
+* fixed bug with sprites showing up multiple times.
+
+
 ### V0.4 ###
 * Implement Switch tile type
 * Fix ordering of chicken's and fish dependent on what moved last
 * Level 8 added
 * Level 9 added
 * Fixed chicken and fish not correctly being killed
+
 
 ### V0.3 ###
 * Level 5 added
